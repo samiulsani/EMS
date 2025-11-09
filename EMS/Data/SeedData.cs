@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EMS.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +15,8 @@ namespace EMS.Data
         public static async Task SeedRolesAndAdminAsync(IServiceProvider serviceProvider, IConfiguration configuration)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
             foreach (var role in Roles)
             {
@@ -40,7 +42,7 @@ namespace EMS.Data
             var admin = await userManager.FindByEmailAsync(adminEmail);
             if (admin == null)
             {
-                admin = new IdentityUser
+                admin = new ApplicationUser
                 {
                     UserName = adminUserName,
                     Email = adminEmail,
@@ -66,5 +68,4 @@ namespace EMS.Data
             await userManager.SetLockoutEnabledAsync(admin, false);
         }
     }
-
 }
