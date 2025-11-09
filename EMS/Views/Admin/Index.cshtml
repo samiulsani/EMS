@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Admin Panel";
+}
+
+<h1>@ViewData["Title"]</h1>
+<p>Welcome to the Admin control panel.</p>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (ViewBag.StatusMessage != null)
+{
+    <div class="alert alert-success" role="alert">
+        @ViewBag.StatusMessage
+    </div>
+}
+
+<hr />
+
+<h3>User Management</h3>
+<div>
+    <a class="btn btn-primary"
+       asp-controller="Admin"
+       asp-action="CreateUser">
+        Create New User
+    </a>
+
+    <a class="btn btn-primary"
+       asp-controller="Admin"
+       asp-action="ListUsers">
+        View Users
+    </a>
+</div>
