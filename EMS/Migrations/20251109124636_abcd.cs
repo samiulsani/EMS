@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace EMS.Data.Migrations
+namespace EMS.Migrations
 {
     /// <inheritdoc />
-    public partial class AppUser : Migration
+    public partial class abcd : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

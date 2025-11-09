@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace EMS.Data.Migrations
+namespace EMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251109112247_AppUser1")]
-    partial class AppUser1
+    [Migration("20251109124636_abcd")]
+    partial class abcd
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
