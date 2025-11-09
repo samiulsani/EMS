@@ -17,6 +17,6 @@ namespace EMS.Models
         public int? DepartmentId { get; set; }
 
         // Navigation Property: ডিপার্টমেন্ট টেবিলের সাথে লিঙ্ক
-        public Department Department { get; set; }
+        public Department? Department { get; set; }
     }
 }
