@@ -22,5 +22,10 @@ namespace EMS.Models
 
         // Navigation Property: ডিপার্টমেন্ট টেবিলের সাথে লিঙ্ক
         public Department? Department { get; set; }
+
+        // সেমিস্টার (কোর্সটি কোন সেমিস্টারের)
+        [Required]
+        public int SemesterId { get; set; }
+        public Semester? Semester { get; set; }
     }
 }

@@ -46,7 +46,9 @@ namespace EMS.Data
                 {
                     UserName = adminUserName,
                     Email = adminEmail,
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    FirstName = "Admin",  // <-- এই লাইনটি যোগ করো
+                    LastName = "User"
                 };
 
                 var createResult = await userManager.CreateAsync(admin, adminPassword);

@@ -18,5 +18,9 @@ namespace EMS.Models
 
         // Navigation Property: ডিপার্টমেন্ট টেবিলের সাথে লিঙ্ক
         public Department? Department { get; set; }
+
+        // সেমিস্টার (শুধুমাত্র স্টুডেন্টদের জন্য, তাই Nullable)
+        public int? SemesterId { get; set; }
+        public Semester? Semester { get; set; }
     }
 }

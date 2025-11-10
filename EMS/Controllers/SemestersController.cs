@@ -12,23 +12,22 @@ using System.Threading.Tasks;
 namespace EMS.Controllers
 {
     [Authorize(Roles = "Admin")]
-    public class CoursesController : Controller
+    public class SemestersController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public CoursesController(ApplicationDbContext context)
+        public SemestersController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Courses
+        // GET: Semesters
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Courses.Include(c => c.Department).Include(c => c.Semester);
-            return View(await applicationDbContext.ToListAsync());
+            return View(await _context.Semesters.ToListAsync());
         }
 
-        // GET: Courses/Details/5
+        // GET: Semesters/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -36,45 +35,39 @@ namespace EMS.Controllers
                 return NotFound();
             }
 
-            var course = await _context.Courses
-                .Include(c => c.Department)
-                .Include(c => c.Semester)
+            var semester = await _context.Semesters
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (course == null)
+            if (semester == null)
             {
                 return NotFound();
             }
 
-            return View(course);
+            return View(semester);
         }
 
-        // GET: Courses/Create
+        // GET: Semesters/Create
         public IActionResult Create()
         {
-            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "FullName");
-            ViewData["SemesterId"] = new SelectList(_context.Semesters, "Id", "Name");
             return View();
         }
 
-        // POST: Courses/Create
+        // POST: Semesters/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CourseCode,Title,Credits,DepartmentId,SemesterId")] Course course)
+        public async Task<IActionResult> Create([Bind("Id,Name")] Semester semester)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(course);
+                _context.Add(semester);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "FullName", course.DepartmentId);
-            ViewData["SemesterId"] = new SelectList(_context.Semesters, "Id", "Name", course.SemesterId);
-            return View(course);
+            return View(semester);
         }
 
-        // GET: Courses/Edit/5
+        // GET: Semesters/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -82,24 +75,22 @@ namespace EMS.Controllers
                 return NotFound();
             }
 
-            var course = await _context.Courses.FindAsync(id);
-            if (course == null)
+            var semester = await _context.Semesters.FindAsync(id);
+            if (semester == null)
             {
                 return NotFound();
             }
-            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "FullName", course.DepartmentId);
-            ViewData["SemesterId"] = new SelectList(_context.Semesters, "Id", "Name", course.SemesterId);
-            return View(course);
+            return View(semester);
         }
 
-        // POST: Courses/Edit/5
+        // POST: Semesters/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CourseCode,Title,Credits,DepartmentId,SemesterId")] Course course)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Semester semester)
         {
-            if (id != course.Id)
+            if (id != semester.Id)
             {
                 return NotFound();
             }
@@ -108,12 +99,12 @@ namespace EMS.Controllers
             {
                 try
                 {
-                    _context.Update(course);
+                    _context.Update(semester);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CourseExists(course.Id))
+                    if (!SemesterExists(semester.Id))
                     {
                         return NotFound();
                     }
@@ -124,12 +115,10 @@ namespace EMS.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "FullName", course.DepartmentId);
-            ViewData["SemesterId"] = new SelectList(_context.Semesters, "Id", "Name", course.SemesterId);
-            return View(course);
+            return View(semester);
         }
 
-        // GET: Courses/Delete/5
+        // GET: Semesters/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -137,36 +126,34 @@ namespace EMS.Controllers
                 return NotFound();
             }
 
-            var course = await _context.Courses
-                .Include(c => c.Department)
-                .Include(c => c.Semester)
+            var semester = await _context.Semesters
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (course == null)
+            if (semester == null)
             {
                 return NotFound();
             }
 
-            return View(course);
+            return View(semester);
         }
 
-        // POST: Courses/Delete/5
+        // POST: Semesters/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var course = await _context.Courses.FindAsync(id);
-            if (course != null)
+            var semester = await _context.Semesters.FindAsync(id);
+            if (semester != null)
             {
-                _context.Courses.Remove(course);
+                _context.Semesters.Remove(semester);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CourseExists(int id)
+        private bool SemesterExists(int id)
         {
-            return _context.Courses.Any(e => e.Id == id);
+            return _context.Semesters.Any(e => e.Id == id);
         }
     }
 }
