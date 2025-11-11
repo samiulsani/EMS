@@ -1,0 +1,107 @@
+﻿@model IEnumerable<EMS.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Students List";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Students Management</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a asp-action="CreateUser" class="btn btn-sm btn-primary">
+            <i class="fa-solid fa-plus"></i> Add New Student
+        </a>
+    </div>
+</div>
+
+<div class="card mb-4 shadow-sm bg-light">
+    <div class="card-body py-3">
+        <form asp-action="Students" method="get">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small">Search</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Name or Roll No..." />
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small">Department</label>
+                    <select name="departmentId" class="form-select" asp-items="ViewBag.DepartmentId">
+                        <option value="">All Departments</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small">Semester</label>
+                    <select name="semesterId" class="form-select" asp-items="ViewBag.SemesterId">
+                        <option value="">All Semesters</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small">Session</label>
+                    <select name="session" class="form-select" asp-items="ViewBag.Session">
+                        <option value="">All Sessions</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 text-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fa-solid fa-filter"></i> Filter
+                    </button>
+                    <a asp-action="Students" class="btn btn-outline-secondary">
+                        <i class="fa-solid fa-rotate-right"></i> Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="table-responsive card shadow-sm">
+    <table class="table table-hover mb-0 align-middle">
+        <thead class="bg-light">
+            <tr>
+                <th>Name</th>
+                <th>Roll No</th>
+                <th>Department</th>
+                <th>Semester</th>
+                <th>Session</th>
+                <th>Phone</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Count() == 0)
+            {
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        <i class="fa-solid fa-box-open fa-2x mb-2"></i>
+                        <p>No students found matching your criteria.</p>
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var student in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@student.FirstName @student.LastName</td>
+                        <td><span class="badge bg-secondary">@student.StudentProfile?.StudentRoll</span></td>
+                        <td>@student.StudentProfile?.Department?.Name</td>
+                        <td>@student.StudentProfile?.Semester?.Name</td>
+                        <td>@student.StudentProfile?.Session</td>
+                        <td>@student.PhoneNumber</td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a asp-action="Details" asp-route-id="@student.Id" class="btn btn-outline-info" title="Details"><i class="fa-solid fa-eye"></i></a>
+                                <a asp-action="Edit" asp-route-id="@student.Id" class="btn btn-outline-warning" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                                <a asp-action="Delete" asp-route-id="@student.Id" class="btn btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

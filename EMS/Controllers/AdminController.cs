@@ -410,5 +410,79 @@ namespace EMS.Controllers
 
             return View(userListModel);
         }
+
+
+        //Admin dashboard all student list showing with filtering system.
+        // GET: Admin/Students
+        public async Task<IActionResult> Students(string searchString, int? departmentId, int? semesterId, string session)
+        {
+            // ১. বেসিক কুয়েরি তৈরি (এখনো এক্সিকিউট হয়নি)
+            var studentsQuery = _context.Users
+                .Include(u => u.StudentProfile)
+                    .ThenInclude(sp => sp.Department)
+                .Include(u => u.StudentProfile)
+                    .ThenInclude(sp => sp.Semester)
+                .Where(u => u.StudentProfile != null) // শুধুমাত্র স্টুডেন্টদের নাও
+                .AsQueryable();
+
+            // ২. সার্চ লজিক (নাম অথবা রোল দিয়ে সার্চ)
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                studentsQuery = studentsQuery.Where(s =>
+                    s.FirstName.Contains(searchString) ||
+                    s.LastName.Contains(searchString) ||
+                    s.StudentProfile.StudentRoll.Contains(searchString));
+            }
+
+            // ৩. ডিপার্টমেন্ট ফিল্টার
+            if (departmentId.HasValue)
+            {
+                studentsQuery = studentsQuery.Where(s => s.StudentProfile.DepartmentId == departmentId);
+            }
+
+            // ৪. সেমিস্টার ফিল্টার
+            if (semesterId.HasValue)
+            {
+                studentsQuery = studentsQuery.Where(s => s.StudentProfile.SemesterId == semesterId);
+            }
+
+            // ৫. সেশন ফিল্টার
+            if (!string.IsNullOrEmpty(session))
+            {
+                studentsQuery = studentsQuery.Where(s => s.StudentProfile.Session == session);
+            }
+
+            // ৬. ড্রপডাউনগুলোর জন্য ডেটা প্রস্তুত করা
+            // সেশন লিস্ট (ডেটাবেস থেকে ইউনিক সেশনগুলো বের করা)
+            var sessions = await _context.StudentProfiles
+                                         .Select(sp => sp.Session)
+                                         .Distinct()
+                                         .ToListAsync();
+
+            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Name", departmentId);
+            ViewData["SemesterId"] = new SelectList(_context.Semesters, "Id", "Name", semesterId);
+            ViewData["Session"] = new SelectList(sessions, session);
+
+            // সার্চ ভ্যালু মনে রাখার জন্য
+            ViewData["CurrentFilter"] = searchString;
+
+            // ৭. ফাইনাল রেজাল্ট
+            var students = await studentsQuery.ToListAsync();
+            return View(students);
+        }
+
+        // GET: Admin/Teachers
+        public async Task<IActionResult> Teachers()
+        {
+            // শুধুমাত্র যাদের TeacherProfile আছে (মানে টিচার) তাদের খুঁজে বের করো
+            var teachers = await _context.Users
+                .Include(u => u.TeacherProfile)
+                    .ThenInclude(tp => tp.Department) // ডিপার্টমেন্ট নাম দেখানোর জন্য
+                .Where(u => u.TeacherProfile != null) // ফিল্টার
+                .ToListAsync();
+
+            return View(teachers);
+        }
+
     }
 }
