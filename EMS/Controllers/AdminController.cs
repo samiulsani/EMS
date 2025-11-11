@@ -164,7 +164,7 @@ namespace EMS.Controllers
             return View(model);
         }
 
-        //Get Details from user
+        //Get Details from user. It's for user managment 
         // GET: Admin/Details/5
         public async Task<IActionResult> Details(string id)
         {
@@ -191,7 +191,7 @@ namespace EMS.Controllers
             return View(user);
         }
 
-        //User Delete with confirmation
+        //User Delete with confirmation. It's for users managment.
         // GET: Admin/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
@@ -254,6 +254,141 @@ namespace EMS.Controllers
                 }
             }
             return RedirectToAction(nameof(ListUsers));
+        }
+
+
+        //User edit option added for user managment.
+        // GET: Admin/Edit/5
+        public async Task<IActionResult> Edit(string id)
+        {
+            if (id == null) return NotFound();
+
+            // ইউজার এবং তার প্রোফাইল লোড করো
+            var user = await _context.Users
+                .Include(u => u.StudentProfile)
+                .Include(u => u.TeacherProfile)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null) return NotFound();
+
+            // ইউজারের রোল বের করো
+            var roles = await _userManager.GetRolesAsync(user);
+            var userRole = roles.FirstOrDefault();
+
+            // ViewModel-এ ডেটা লোড করো
+            var model = new EditUserViewModel
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                Role = userRole,
+
+                // ড্রপডাউন লোড করো
+                DepartmentList = new SelectList(await _context.Departments.ToListAsync(), "Id", "Name"),
+                SemesterList = new SelectList(await _context.Semesters.ToListAsync(), "Id", "Name")
+            };
+
+            // প্রোফাইল থেকে ডেটা নিয়ে ViewModel-এ বসাও
+            if (userRole == "Student" && user.StudentProfile != null)
+            {
+                model.DepartmentId = user.StudentProfile.DepartmentId;
+                model.SemesterId = user.StudentProfile.SemesterId;
+                model.StudentRoll = user.StudentProfile.StudentRoll;
+                model.RegistrationNo = user.StudentProfile.RegistrationNo;
+                model.Session = user.StudentProfile.Session;
+                model.DateOfBirth = user.StudentProfile.DateOfBirth;
+                model.BloodGroup = user.StudentProfile.BloodGroup;
+                model.FatherName = user.StudentProfile.FatherName;
+                model.MotherName = user.StudentProfile.MotherName;
+                model.Address = user.StudentProfile.Address;
+            }
+            else if (userRole == "Teacher" && user.TeacherProfile != null)
+            {
+                model.DepartmentId = user.TeacherProfile.DepartmentId;
+                model.Designation = user.TeacherProfile.Designation;
+            }
+
+            return View(model);
+        }
+
+        // POST: Admin/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(string id, EditUserViewModel model)
+        {
+            if (id != model.Id) return NotFound();
+
+            // ভ্যালিডেশন (পাসওয়ার্ড বাদে)
+            if (model.Role == "Student")
+            {
+                if (model.SemesterId == null) ModelState.AddModelError("SemesterId", "Required for Student");
+                // ... অন্যান্য প্রয়োজনীয় ফিল্ড চেক করতে পারো ...
+            }
+
+            if (ModelState.IsValid)
+            {
+                var user = await _context.Users
+                    .Include(u => u.StudentProfile)
+                    .Include(u => u.TeacherProfile)
+                    .FirstOrDefaultAsync(u => u.Id == id);
+
+                if (user == null) return NotFound();
+
+                // ১. বেসিক ইনফো আপডেট
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.PhoneNumber = model.PhoneNumber;
+                // user.Email আপডেট করা সাবধানতার বিষয়, আপাতত বাদ রাখলাম
+
+                // ২. প্রোফাইল আপডেট
+                if (model.Role == "Student")
+                {
+                    var student = user.StudentProfile;
+                    if (student == null)
+                    {
+                        // যদি প্রোফাইল না থাকে (অস্বাভাবিক), নতুন বানাও
+                        student = new StudentProfile { Id = user.Id };
+                        _context.StudentProfiles.Add(student);
+                    }
+
+                    student.DepartmentId = model.DepartmentId;
+                    student.SemesterId = model.SemesterId.Value;
+                    student.StudentRoll = model.StudentRoll;
+                    student.RegistrationNo = model.RegistrationNo;
+                    student.Session = model.Session;
+                    student.DateOfBirth = model.DateOfBirth ?? DateTime.Now;
+                    student.BloodGroup = model.BloodGroup;
+                    student.FatherName = model.FatherName;
+                    student.MotherName = model.MotherName;
+                    student.Address = model.Address;
+                }
+                else if (model.Role == "Teacher")
+                {
+                    var teacher = user.TeacherProfile;
+                    if (teacher == null)
+                    {
+                        teacher = new TeacherProfile { Id = user.Id };
+                        _context.TeacherProfiles.Add(teacher);
+                    }
+
+                    teacher.DepartmentId = model.DepartmentId;
+                    teacher.Designation = model.Designation;
+                }
+
+                // ৩. সেভ করো
+                await _userManager.UpdateAsync(user); // ইউজার টেবিল আপডেট
+                await _context.SaveChangesAsync(); // প্রোফাইল টেবিল আপডেট
+
+                TempData["SuccessMessage"] = "User updated successfully!";
+                return RedirectToAction(nameof(ListUsers));
+            }
+
+            // Error হলে ড্রপডাউন আবার পাঠাও
+            model.DepartmentList = new SelectList(await _context.Departments.ToListAsync(), "Id", "Name", model.DepartmentId);
+            model.SemesterList = new SelectList(await _context.Semesters.ToListAsync(), "Id", "Name", model.SemesterId);
+            return View(model);
         }
 
 
