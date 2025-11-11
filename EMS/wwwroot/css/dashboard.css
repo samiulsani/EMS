@@ -24,6 +24,10 @@
 .sidebar .nav-link {
     font-weight: 500;
     color: #333;
+    padding: 10px 15px; /* একটু প্যাডিং বাড়ালাম যাতে দেখতে ভালো লাগে */
+    margin-bottom: 5px;
+    border-radius: 5px; /* কোণাগুলো গোল করার জন্য */
+    transition: all 0.3s; /* স্মুথ অ্যানিমেশন */
 }
 
     .sidebar .nav-link .fa-solid {
@@ -34,8 +38,30 @@
 
 
     .sidebar .nav-link.active {
+        color: #fff; /* টেক্সট কালার সাদা */
+        background-color: #0d6efd; /* ব্যাকগ্রাউন্ড নীল (Bootstrap Primary) */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* হালকা শ্যাডো */
+    }
+
+    .sidebar .nav-link.active .fa-solid {
+            color: #fff;
+    }
+
+    .sidebar .nav-link:hover:not(.active) {
+        background-color: #f0f0f0; /* হোভার করলে হালকা ধূসর */
         color: #0d6efd;
     }
+
+    /* 2. Active আইটেমের ওপর হোভার ফিক্স (এই অংশটি তোমার মিসিং বা আপডেট দরকার) */
+    .sidebar .nav-link.active:hover {
+        color: #fff !important; /* টেক্সট অবশ্যই সাদা থাকবে */
+        background-color: #0d6efd !important; /* ব্যাকগ্রাউন্ড নীলই থাকবে */
+    }
+
+        /* 3. Active আইটেমের আইকন কালার ফিক্স */
+        .sidebar .nav-link.active:hover .fa-solid {
+            color: #fff !important; /* আইকনও সাদা থাকবে */
+        }
 
     .sidebar .nav-link:hover .fa-solid,
     .sidebar .nav-link:hover {

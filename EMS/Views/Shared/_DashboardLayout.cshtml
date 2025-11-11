@@ -29,44 +29,63 @@
 
             <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
                 <div class="position-sticky pt-4">
+
+                    @{
+                        string currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+                        string currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+                    }
+
                     <ul class="nav flex-column">
+
                         <li class="nav-item">
-                            <a class="nav-link active" asp-controller="Admin" asp-action="Index">
+                            <a class="nav-link @(currentController == "Admin" && currentAction == "Index" ? "active" : "")"
+                               asp-controller="Admin" asp-action="Index">
                                 <i class="fa-solid fa-house me-2"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Departments" asp-action="Index">
-                                <i class="fa-solid fa-building-columns me-2"></i> Departments
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Semesters" asp-action="Index">
-                                <i class="fa-solid fa-layer-group me-2"></i> Semesters
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Admin" asp-action="ListUsers">
-                                <i class="fa-solid fa-users me-2"></i> Manage Users
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Courses" asp-action="Index">
+                            <a class="nav-link @(currentController == "Departments" ? "active" : "")"
+                               asp-controller="Departments" asp-action="Index">
+                                <i class="fa-solid fa-building-columns me-2"></i> Departments
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "Semesters" ? "active" : "")"
+                               asp-controller="Semesters" asp-action="Index">
+                                <i class="fa-solid fa-layer-group me-2"></i> Semesters
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "Courses" ? "active" : "")"
+                               asp-controller="Courses" asp-action="Index">
                                 <i class="fa-solid fa-book me-2"></i> Courses
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Admin" asp-action="Students">
+                            <a class="nav-link @(currentController == "Admin" && currentAction == "Students" ? "active" : "")"
+                               asp-controller="Admin" asp-action="Students">
                                 <i class="fa-solid fa-user-graduate me-2"></i> Students
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Admin" asp-action="Teachers">
+                            <a class="nav-link @(currentController == "Admin" && currentAction == "Teachers" ? "active" : "")"
+                               asp-controller="Admin" asp-action="Teachers">
                                 <i class="fa-solid fa-chalkboard-user me-2"></i> Teachers
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "Admin" && currentAction == "ListUsers" ? "active" : "")"
+                               asp-controller="Admin" asp-action="ListUsers">
+                                <i class="fa-solid fa-users me-2"></i> Manage Users
+                            </a>
+                        </li>
+
                     </ul>
                 </div>
             </nav>
