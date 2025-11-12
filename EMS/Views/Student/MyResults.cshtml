@@ -1,0 +1,57 @@
+﻿@model IEnumerable<EMS.Models.ViewModels.StudentResultViewModel>
+
+@{
+    ViewData["Title"] = "My Exam Results";
+}
+
+<h2 class="mb-4"><i class="fa-solid fa-square-poll-vertical text-primary"></i> Exam Results</h2>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Exam Name</th>
+                        <th>Course</th>
+                        <th class="text-center">Marks</th>
+                        <th class="text-center">Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-muted">@item.ExamDate.ToString("dd MMM yyyy")</td>
+                                <td class="fw-bold">@item.ExamTitle</td>
+                                <td>
+                                    <span class="text-primary fw-bold">@item.CourseCode</span>
+                                    <div class="small text-muted">@item.CourseTitle</div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="fw-bold">@item.MarksObtained</span>
+                                    <span class="text-muted small"> / @item.TotalMarks</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-@item.GradeColor fs-6">@item.Grade</span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-5">
+                                <i class="fa-solid fa-file-circle-xmark fa-2x mb-3"></i>
+                                <p class="mb-0">No exam results published yet.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

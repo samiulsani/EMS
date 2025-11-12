@@ -39,7 +39,9 @@
                             <td><span class="badge bg-info text-dark">@item.ExamType</span></td>
                             <td>@item.TotalMarks</td>
                             <td class="text-end">
-                                <button class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                                <a asp-action="InputMarks" asp-route-examId="@item.Id" class="btn btn-sm btn-outline-primary" title="Input/Edit Marks">
+                                    <i class="fa-solid fa-pen-to-square"></i> Input Marks
+                                </a>
                             </td>
                         </tr>
                     }

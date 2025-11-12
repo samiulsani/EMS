@@ -126,8 +126,9 @@
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link" href="#">
-                                    <i class="fa-solid fa-square-poll-vertical me-2"></i> Results (Soon)
+                                <a class="nav-link @(currentController == "Student" && currentAction == "MyResults" ? "active" : "")"
+                                   asp-controller="Student" asp-action="MyResults">
+                                    <i class="fa-solid fa-square-poll-vertical me-2"></i> Results
                                 </a>
                             </li>
                         }

@@ -406,5 +406,96 @@ namespace EMS.Controllers
             ViewBag.CourseId = new SelectList(courses, "Id", "Title", exam.CourseId);
             return View(exam);
         }
+
+        // Input Marks Section for Teacher 
+        // GET: Teacher/InputMarks/5
+        public async Task<IActionResult> InputMarks(int examId)
+        {
+            // ১. এক্সাম এবং কোর্স তথ্য লোড করো
+            var exam = await _context.Exams
+                .Include(e => e.Course)
+                .FirstOrDefaultAsync(e => e.Id == examId);
+
+            if (exam == null) return NotFound();
+
+            // ২. সিকিউরিটি চেক (টিচার ভেরিফিকেশন)
+            var userId = _userManager.GetUserId(User);
+            if (exam.Course.TeacherId != userId) return RedirectToAction("AccessDenied", "Account");
+
+            // ৩. স্টুডেন্টদের লোড করো (যাদের ডিপার্টমেন্ট ও সেমিস্টার মিলে)
+            var students = await _context.Users
+                .Include(u => u.StudentProfile)
+                .Where(u => u.StudentProfile != null &&
+                            u.StudentProfile.DepartmentId == exam.Course.DepartmentId &&
+                            u.StudentProfile.SemesterId == exam.Course.SemesterId)
+                .OrderBy(u => u.StudentProfile.StudentRoll)
+                .ToListAsync();
+
+            // ৪. আগের কোনো রেজাল্ট আছে কিনা চেক করো
+            var existingResults = await _context.ExamResults
+                .Where(r => r.ExamId == examId)
+                .ToListAsync();
+
+            // ৫. ViewModel তৈরি করো
+            var model = new ExamMarksViewModel
+            {
+                ExamId = exam.Id,
+                ExamTitle = exam.Title,
+                CourseTitle = exam.Course.CourseCode,
+                TotalMarks = exam.TotalMarks,
+                ExamDate = exam.ExamDate,
+                Students = students.Select(s => {
+                    var result = existingResults.FirstOrDefault(r => r.StudentId == s.Id);
+                    return new StudentMarksRow
+                    {
+                        StudentId = s.Id,
+                        StudentName = $"{s.FirstName} {s.LastName}",
+                        RollNo = s.StudentProfile.StudentRoll,
+                        MarksObtained = result != null ? result.MarksObtained : 0 // আগে মার্কস থাকলে সেটা দেখাও, না থাকলে ০
+                    };
+                }).ToList()
+            };
+
+            return View(model);
+        }
+
+        // POST: Teacher/InputMarks
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> InputMarks(ExamMarksViewModel model)
+        {
+            // ১. আগের রেকর্ডগুলো মুছে ফেলো (সিম্পল লজিক: ডিলেট অ্যান্ড ইনসার্ট)
+            var existingResults = await _context.ExamResults
+                .Where(r => r.ExamId == model.ExamId)
+                .ToListAsync();
+
+            if (existingResults.Any())
+            {
+                _context.ExamResults.RemoveRange(existingResults);
+            }
+
+            // ২. নতুন মার্কস সেভ করো
+            foreach (var item in model.Students)
+            {
+                // ভ্যালিডেশন: মার্কস যেন টোটাল মার্কসের বেশি না হয়
+                if (item.MarksObtained > model.TotalMarks)
+                {
+                    // তুমি চাইলে এখানে এরর হ্যান্ডেল করতে পারো, আমি আপাতত ম্যাক্সিমাম ভ্যালুটাই সেট করে দিচ্ছি
+                    item.MarksObtained = model.TotalMarks;
+                }
+
+                var result = new ExamResult
+                {
+                    ExamId = model.ExamId,
+                    StudentId = item.StudentId,
+                    MarksObtained = item.MarksObtained
+                };
+                _context.ExamResults.Add(result);
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Marks updated successfully!";
+            return RedirectToAction(nameof(ManageExams));
+        }
     }
 }

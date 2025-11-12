@@ -127,5 +127,33 @@ namespace EMS.Controllers
 
             return View(model);
         }
+
+        // Student Exam Results 
+        // GET: Student/MyResults
+        public async Task<IActionResult> MyResults()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // ১. এই স্টুডেন্টের সব রেজাল্ট লোড করো (সাথে এক্সাম এবং কোর্স ইনফো)
+            var results = await _context.ExamResults
+                .Include(r => r.Exam)
+                    .ThenInclude(e => e.Course)
+                .Where(r => r.StudentId == userId)
+                .OrderByDescending(r => r.Exam.ExamDate) // লেটেস্ট এক্সাম আগে
+                .ToListAsync();
+
+            // ২. ViewModel-এ ম্যাপ করো
+            var model = results.Select(r => new EMS.Models.ViewModels.StudentResultViewModel
+            {
+                CourseCode = r.Exam.Course.CourseCode,
+                CourseTitle = r.Exam.Course.Title,
+                ExamTitle = r.Exam.Title,
+                ExamDate = r.Exam.ExamDate,
+                TotalMarks = r.Exam.TotalMarks,
+                MarksObtained = r.MarksObtained
+            }).ToList();
+
+            return View(model);
+        }
     }
 }
