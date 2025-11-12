@@ -24,7 +24,7 @@ namespace EMS.Controllers
         // GET: Courses
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Courses.Include(c => c.Department).Include(c => c.Semester);
+            var applicationDbContext = _context.Courses.Include(c => c.Department).Include(c => c.Semester).Include(c => c.Teacher);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -39,6 +39,7 @@ namespace EMS.Controllers
             var course = await _context.Courses
                 .Include(c => c.Department)
                 .Include(c => c.Semester)
+                .Include(c => c.Teacher)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (course == null)
             {
@@ -61,7 +62,7 @@ namespace EMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CourseCode,Title,Credits,DepartmentId,SemesterId")] Course course)
+        public async Task<IActionResult> Create([Bind("Id,CourseCode,Title,Credits,DepartmentId,SemesterId,TeacherId")] Course course)
         {
             if (ModelState.IsValid)
             {
@@ -97,7 +98,7 @@ namespace EMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CourseCode,Title,Credits,DepartmentId,SemesterId")] Course course)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,CourseCode,Title,Credits,DepartmentId,SemesterId,TeacherId")] Course course)
         {
             if (id != course.Id)
             {
@@ -140,6 +141,7 @@ namespace EMS.Controllers
             var course = await _context.Courses
                 .Include(c => c.Department)
                 .Include(c => c.Semester)
+                .Include(c => c.Teacher)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (course == null)
             {
@@ -216,6 +218,22 @@ namespace EMS.Controllers
 
             TempData["SuccessMessage"] = "Teacher assigned successfully!";
             return RedirectToAction(nameof(Index));
+        }
+
+
+        // AJAX-এর মাধ্যমে টিচার লোড করার জন্য API
+        public async Task<JsonResult> GetTeachersByDepartment(int departmentId)
+        {
+            var teachers = await _context.Users
+                .Include(u => u.TeacherProfile)
+                .Where(u => u.TeacherProfile != null && u.TeacherProfile.DepartmentId == departmentId)
+                .Select(u => new {
+                    id = u.Id,
+                    name = u.FirstName + " " + u.LastName + " (" + u.TeacherProfile.Designation + ")"
+                })
+                .ToListAsync();
+
+            return Json(teachers);
         }
     }
 }

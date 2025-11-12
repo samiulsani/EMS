@@ -27,6 +27,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Semester)
             </th>
+            <th>Assigned Teacher</th>
             <th></th>
         </tr>
     </thead>
@@ -50,9 +51,19 @@
                     @Html.DisplayFor(modelItem => item.Semester.Name)
                 </td>
                 <td>
-                    <a asp-action="AssignTeacher" asp-route-id="@item.Id" class="btn btn-sm btn-outline-dark mb-1" title="Assign Teacher">
+                    @if (item.Teacher != null)
+                    {
+                        <span class="badge bg-success">@item.Teacher.FirstName @item.Teacher.LastName</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Not Assigned</span>
+                    }
+                </td>
+                <td>
+                    @* <a asp-action="AssignTeacher" asp-route-id="@item.Id" class="btn btn-sm btn-outline-dark mb-1" title="Assign Teacher">
                         <i class="fa-solid fa-chalkboard-user"></i> Assign
-                    </a>
+                    </a> *@
 
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |

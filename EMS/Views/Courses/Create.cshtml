@@ -42,6 +42,15 @@
                 </select>
                 <span asp-validation-for="SemesterId" class="text-danger"></span>
             </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="TeacherId" class="control-label">Assign Teacher</label>
+                <select asp-for="TeacherId" class="form-control" id="TeacherId" disabled>
+                    <option value="">-- Select Department First --</option>
+                </select>
+                <span asp-validation-for="TeacherId" class="text-danger"></span>
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
                 <a asp-action="Index" class="btn btn-secondary">Back to List</a>
@@ -54,4 +63,36 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        $(document).ready(function () {
+            // ডিপার্টমেন্ট পরিবর্তন হলে টিচার লোড হবে
+            $("#DepartmentId").change(function () {
+                var deptId = $(this).val();
+                var teacherSelect = $("#TeacherId");
+
+                // ড্রপডাউন খালি করো
+                teacherSelect.empty();
+                teacherSelect.append('<option value="">-- Select Teacher --</option>');
+
+                if (deptId) {
+                    // AJAX কল
+                    $.ajax({
+                        url: '/Courses/GetTeachersByDepartment',
+                        type: 'GET',
+                        data: { departmentId: deptId },
+                        success: function (data) {
+                            // টিচার লোড করো
+                            $.each(data, function (i, teacher) {
+                                teacherSelect.append($('<option></option>').val(teacher.id).html(teacher.name));
+                            });
+                            teacherSelect.prop('disabled', false); // ড্রপডাউন সচল করো
+                        }
+                    });
+                } else {
+                    teacherSelect.prop('disabled', true); // ডিপার্টমেন্ট না থাকলে অচল
+                }
+            });
+        });
+    </script>
 }

@@ -41,7 +41,15 @@
                     <option value="">-- Select Seemester --</option>
                 </select>
                 <span asp-validation-for="SemesterId" class="text-danger"></span>
-            </div
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="TeacherId" class="control-label">Assign Teacher</label>
+                <select asp-for="TeacherId" class="form-control" id="TeacherId">
+                    <option value="">-- Select Teacher --</option>
+                </select>
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -54,5 +62,49 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            var selectedTeacher = '@Model.TeacherId'; // বর্তমান টিচার আইডি
+
+            // ফাংশন: টিচার লোড করার জন্য
+            function loadTeachers(deptId, selectedId) {
+                var teacherSelect = $("#TeacherId");
+                teacherSelect.empty();
+                teacherSelect.append('<option value="">-- Select Teacher --</option>');
+
+                if (deptId) {
+                    $.ajax({
+                        url: '/Courses/GetTeachersByDepartment',
+                        type: 'GET',
+                        data: { departmentId: deptId },
+                        success: function (data) {
+                            $.each(data, function (i, teacher) {
+                                var option = $('<option></option>').val(teacher.id).html(teacher.name);
+                                if (teacher.id === selectedId) {
+                                    option.prop('selected', true); // আগে থেকে সিলেক্টেড থাকলে সেট করো
+                                }
+                                teacherSelect.append(option);
+                            });
+                        }
+                    });
+                }
+            }
+
+            // ১. পেজ লোড হওয়ার সময় একবার রান করো
+            var initialDept = $("#DepartmentId").val();
+            if (initialDept) {
+                loadTeachers(initialDept, selectedTeacher);
+            }
+
+            // ২. ডিপার্টমেন্ট চেঞ্জ হলে রান করো
+            $("#DepartmentId").change(function () {
+                var deptId = $(this).val();
+                loadTeachers(deptId, null);
+            });
+        });
+    </script>
 }
