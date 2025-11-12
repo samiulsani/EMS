@@ -1,0 +1,62 @@
+﻿@model IEnumerable<EMS.Models.AssignmentSubmission>
+
+@{
+    ViewData["Title"] = "Submissions";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="text-primary"><i class="fa-solid fa-file-arrow-down"></i> Submissions: @ViewBag.AssignmentTitle</h2>
+    <a asp-action="Index" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back to List</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="bg-light">
+                <tr>
+                    <th>Student Name</th>
+                    <th>Date</th>
+                    <th>File</th>
+                    <th>Marks</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Student.FirstName @item.Student.LastName</td>
+                            <td>@item.SubmissionDate.ToString("dd MMM yyyy, h:mm tt")</td>
+                            <td>
+                                <a href="@item.FileUrl" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="fa-solid fa-download"></i> Download
+                                </a>
+                            </td>
+                            <td>
+                                @if (item.MarksObtained != null)
+                                {
+                                    <span class="badge bg-success">@item.MarksObtained</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-success">Grade</button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-5">No submissions yet.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

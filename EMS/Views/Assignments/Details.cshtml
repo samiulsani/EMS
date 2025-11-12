@@ -1,0 +1,41 @@
+﻿@model EMS.Models.Assignment
+
+@{
+    ViewData["Title"] = "Assignment Details";
+    Layout = "_DashboardLayout";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="text-primary"><i class="fa-solid fa-circle-info"></i> Assignment Details</h3>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-light">
+        <h4 class="mb-0">@Model.Title</h4>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Course:</dt>
+            <dd class="col-sm-9">@Model.Course?.Title (@Model.Course?.CourseCode)</dd>
+
+            <dt class="col-sm-3">Deadline:</dt>
+            <dd class="col-sm-9 text-danger fw-bold">@Model.Deadline.ToString("dd MMMM yyyy, h:mm tt")</dd>
+
+            <dt class="col-sm-3">Total Marks:</dt>
+            <dd class="col-sm-9">@Model.TotalMarks</dd>
+
+            <dt class="col-sm-3">Created:</dt>
+            <dd class="col-sm-9 text-muted">@Model.CreatedDate.ToString("dd MMM yyyy")</dd>
+
+            <dt class="col-sm-12 mt-3">Instructions:</dt>
+            <dd class="col-sm-12 border p-3 bg-white rounded">
+                @Html.Raw(Model.Description.Replace("\n", "<br>"))
+            </dd>
+        </dl>
+    </div>
+    <div class="card-footer">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+        <a asp-action="Submissions" asp-route-id="@Model.Id" class="btn btn-info text-white">View Submissions</a>
+    </div>
+</div>

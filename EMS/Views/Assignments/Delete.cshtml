@@ -1,0 +1,27 @@
+﻿@model EMS.Models.Assignment
+
+@{
+    ViewData["Title"] = "Delete Assignment";
+    Layout = "_DashboardLayout";
+}
+
+<h3 class="text-danger mb-4"><i class="fa-solid fa-trash"></i> Delete Assignment</h3>
+
+<div class="alert alert-warning">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <strong>Warning:</strong> Are you sure you want to delete this assignment? All student submissions related to this assignment will also be deleted!
+</div>
+
+<div class="card shadow-sm border-danger">
+    <div class="card-body">
+        <h4 class="card-title">@Model.Title</h4>
+        <p class="text-muted mb-1">Course: @Model.Course?.CourseCode</p>
+        <p class="text-muted">Deadline: @Model.Deadline.ToString("dd MMM yyyy")</p>
+
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger mt-3">Confirm Delete</button>
+            <a asp-action="Index" class="btn btn-secondary mt-3">Cancel</a>
+        </form>
+    </div>
+</div>

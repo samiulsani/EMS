@@ -1,0 +1,59 @@
+﻿@model EMS.Models.Assignment
+
+@{
+    ViewData["Title"] = "Create Assignment";
+}
+
+<h3 class="mb-4"><i class="fa-solid fa-file-circle-plus text-primary"></i> Create Assignment</h3>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="CourseId" class="form-label fw-bold">Select Course</label>
+                        <select asp-for="CourseId" class="form-select" asp-items="ViewBag.CourseId">
+                            <option value="">-- Select Course --</option>
+                        </select>
+                        <span asp-validation-for="CourseId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label fw-bold">Assignment Title</label>
+                        <input asp-for="Title" class="form-control" placeholder="e.g., Assignment 1: OOP Concepts" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label fw-bold">Instructions / Questions</label>
+                        <textarea asp-for="Description" class="form-control" rows="5" placeholder="Write detailed instructions here..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Deadline" class="form-label fw-bold">Submission Deadline</label>
+                            <input asp-for="Deadline" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="Deadline" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="TotalMarks" class="form-label fw-bold">Total Marks</label>
+                            <input asp-for="TotalMarks" class="form-control" type="number" />
+                            <span asp-validation-for="TotalMarks" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa-solid fa-check"></i> Publish Assignment
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

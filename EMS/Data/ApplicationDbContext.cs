@@ -22,5 +22,28 @@ namespace EMS.Data
         public DbSet<StudentAttendance> StudentAttendances { get; set; }
         public DbSet<Exam> Exams { get; set; }
         public DbSet<ExamResult> ExamResults { get; set; }
+        public DbSet<Assignment> Assignments { get; set; }
+        public DbSet<AssignmentSubmission> AssignmentSubmissions { get; set; }
+
+
+        // Cascade Delete সমস্যা সমাধানের জন্য OnModelCreating ওভাররাইড করো
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // AssignmentSubmission-এর জন্য Cascade Delete বন্ধ করা
+            modelBuilder.Entity<AssignmentSubmission>()
+                .HasOne(s => s.Student)
+                .WithMany()
+                .HasForeignKey(s => s.StudentId)
+                .OnDelete(DeleteBehavior.Restrict); // অথবা DeleteBehavior.NoAction
+
+            // একইভাবে ExamResult এর জন্যও সমস্যা হতে পারে, তাই সেফটির জন্য এটাও দিয়ে রাখতে পারো
+            modelBuilder.Entity<ExamResult>()
+                .HasOne(r => r.Student)
+                .WithMany()
+                .HasForeignKey(r => r.StudentId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }
