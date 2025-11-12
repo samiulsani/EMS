@@ -24,6 +24,7 @@ namespace EMS.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
+            // ১. টিচারের প্রোফাইল লোড করো
             var teacher = await _context.Users
                 .Include(u => u.TeacherProfile)
                     .ThenInclude(tp => tp.Department)
@@ -31,7 +32,14 @@ namespace EMS.Controllers
 
             if (teacher == null) return NotFound();
 
-            // ViewModel-এ ডেটা ম্যাপ করা
+            // ২. টিচারের জন্য অ্যাসাইন করা কোর্সগুলো লোড করো
+            var assignedCourses = await _context.Courses
+                .Include(c => c.Department)
+                .Include(c => c.Semester)
+                .Where(c => c.TeacherId == userId) // শুধু এই টিচারের কোর্স
+                .ToListAsync();
+
+            // ৩. ViewModel-এ ডেটা সেট করো
             var model = new TeacherDashboardViewModel
             {
                 Name = $"{teacher.FirstName} {teacher.LastName}",
@@ -39,7 +47,10 @@ namespace EMS.Controllers
                 Department = teacher.TeacherProfile?.Department?.Name ?? "N/A",
                 Email = teacher.Email,
                 Phone = teacher.PhoneNumber,
-                TotalAssignedCourses = 0 // আপাতত ০, পরে আমরা কোর্স অ্যাসাইন করলে এটা বাড়াবো
+
+                // নতুন ডেটা
+                TotalAssignedCourses = assignedCourses.Count, // কোর্সের সংখ্যা
+                AssignedCourses = assignedCourses             // কোর্সের লিস্ট
             };
 
             return View(model);

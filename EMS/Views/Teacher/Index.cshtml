@@ -34,13 +34,12 @@
     </div>
 
     <div class="col-md-7">
-        <div class="row g-3">
+        <div class="row g-3 mb-4">
             <div class="col-md-6">
                 <div class="card text-center shadow-sm h-100 border-primary">
                     <div class="card-body">
                         <h5 class="card-title text-primary"><i class="fa-solid fa-book-open"></i> Assigned Courses</h5>
                         <p class="display-4 fw-bold my-2">@Model.TotalAssignedCourses</p>
-                        <a href="#" class="btn btn-sm btn-outline-primary">View Courses (Soon)</a>
                     </div>
                 </div>
             </div>
@@ -55,5 +54,52 @@
                 </div>
             </div>
         </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">My Course List</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Title</th>
+                            <th>Semester</th>
+                            <th>Credits</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.AssignedCourses.Any())
+                        {
+                            @foreach (var course in Model.AssignedCourses)
+                            {
+                                <tr>
+                                    <td class="fw-bold text-primary">@course.CourseCode</td>
+                                    <td>@course.Title</td>
+                                    <td><span class="badge bg-info text-dark">@course.Semester?.Name</span></td>
+                                    <td>@course.Credits</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-outline-primary" title="View Details">
+                                            <i class="fa-solid fa-arrow-right"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    <i class="fa-solid fa-circle-exclamation me-2"></i> You have not been assigned any courses yet.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+</div>
 </div>
