@@ -1,0 +1,62 @@
+﻿@model IEnumerable<EMS.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Enrolled Students";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1 text-primary"><i class="fa-solid fa-users-rectangle"></i> Student List</h2>
+        <h5 class="text-muted">
+            Course: <span class="fw-bold text-dark">@ViewBag.CourseTitle (@ViewBag.CourseCode)</span> |
+            Semester: <span class="badge bg-info text-dark">@ViewBag.Semester</span>
+        </h5>
+    </div>
+    <a asp-action="MyCourses" class="btn btn-outline-secondary">
+        <i class="fa-solid fa-arrow-left"></i> Back to Courses
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Roll No</th>
+                        <th>Name</th>
+                        <th>Registration No</th>
+                        <th>Session</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var student in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold">@student.StudentProfile?.StudentRoll</td>
+                                <td>@student.FirstName @student.LastName</td>
+                                <td>@student.StudentProfile?.RegistrationNo</td>
+                                <td><span class="badge bg-secondary">@student.StudentProfile?.Session</span></td>
+                                <td>@student.PhoneNumber</td>
+                                <td><a href="mailto:@student.Email" class="text-decoration-none">@student.Email</a></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                <i class="fa-solid fa-user-slash fa-2x mb-3"></i>
+                                <p class="mb-0">No students found for this semester/department.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

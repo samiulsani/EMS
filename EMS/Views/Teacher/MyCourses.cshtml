@@ -1,0 +1,56 @@
+﻿@model IEnumerable<EMS.Models.Course>
+
+@{
+    ViewData["Title"] = "My Assigned Courses";
+}
+
+<h2 class="mb-4"><i class="fa-solid fa-book-open text-primary"></i> My Courses</h2>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0 text-muted">Total Assigned: <span class="badge bg-primary">@Model.Count()</span></h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="bg-light">
+                <tr>
+                    <th>Course Code</th>
+                    <th>Title</th>
+                    <th>Department</th>
+                    <th>Semester</th>
+                    <th>Credits</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var course in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-primary">@course.CourseCode</td>
+                            <td>@course.Title</td>
+                            <td>@course.Department?.Name</td>
+                            <td><span class="badge bg-info text-dark">@course.Semester?.Name</span></td>
+                            <td>@course.Credits</td>
+                            <td class="text-end">
+                                <a asp-action="EnrolledStudents" asp-route-courseId="@course.Id" class="btn btn-sm btn-outline-success" title="View Student List">
+                                    <i class="fa-solid fa-users"></i> Students
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-5">
+                            <i class="fa-solid fa-circle-exclamation fa-2x mb-3 text-warning"></i>
+                            <p class="mb-0">No courses assigned to you yet.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

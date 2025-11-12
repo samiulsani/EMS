@@ -55,5 +55,57 @@ namespace EMS.Controllers
 
             return View(model);
         }
+
+        //My Couse section showing all assign course.
+        // GET: Teacher/MyCourses
+        public async Task<IActionResult> MyCourses()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // টিচারের অ্যাসাইন করা কোর্সগুলো লোড করো
+            var assignedCourses = await _context.Courses
+                .Include(c => c.Department)
+                .Include(c => c.Semester)
+                .Where(c => c.TeacherId == userId) // ফিল্টার: শুধু এই টিচারের কোর্স
+                .ToListAsync();
+
+            return View(assignedCourses); // লিস্ট পাঠিয়ে দিলাম
+        }
+
+        //Student list based on department semester and courselist
+        // GET: Teacher/EnrolledStudents/5
+        public async Task<IActionResult> EnrolledStudents(int courseId)
+        {
+            // ১. কোর্সটি খুঁজে বের করো (ডিপার্টমেন্ট ও সেমিস্টার জানার জন্য)
+            var course = await _context.Courses
+                .Include(c => c.Department)
+                .Include(c => c.Semester)
+                .FirstOrDefaultAsync(c => c.Id == courseId);
+
+            if (course == null) return NotFound();
+
+            // ২. সিকিউরিটি চেক: এই কোর্সটি কি আসলেই এই টিচারের?
+            var userId = _userManager.GetUserId(User);
+            if (course.TeacherId != userId)
+            {
+                return RedirectToAction("AccessDenied", "Account", new { area = "Identity" });
+            }
+
+            // ৩. লজিক: কোর্সের ডিপার্টমেন্ট ও সেমিস্টারের সাথে মিল থাকা স্টুডেন্টদের খুঁজে বের করো
+            var students = await _context.Users
+                .Include(u => u.StudentProfile)
+                .Where(u => u.StudentProfile != null &&
+                            u.StudentProfile.DepartmentId == course.DepartmentId &&
+                            u.StudentProfile.SemesterId == course.SemesterId)
+                .ToListAsync();
+
+            // ৪. কোর্সের তথ্য ভিউ-তে পাঠানোর জন্য ViewBag ব্যবহার করছি
+            ViewBag.CourseTitle = course.Title;
+            ViewBag.CourseCode = course.CourseCode;
+            ViewBag.Semester = course.Semester?.Name;
+            ViewBag.Department = course.Department?.Name;
+
+            return View(students);
+        }
     }
 }

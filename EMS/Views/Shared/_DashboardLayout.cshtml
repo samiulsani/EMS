@@ -106,8 +106,22 @@
                         @if (User.IsInRole("Teacher"))
                         {
                             <li class="nav-item">
+                                <a class="nav-link @(currentController == "Teacher" && currentAction == "Index" ? "active" : "")"
+                                   asp-controller="Teacher" asp-action="Index">
+                                    <i class="fa-solid fa-house me-2"></i> Dashboard
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "Teacher" && currentAction == "MyCourses" ? "active" : "")"
+                                   asp-controller="Teacher" asp-action="MyCourses">
+                                    <i class="fa-solid fa-book-open me-2"></i> My Courses
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
                                 <a class="nav-link" href="#">
-                                    <i class="fa-solid fa-house me-2"></i> Teacher Dashboard
+                                    <i class="fa-solid fa-check-double me-2"></i> Attendance (Soon)
                                 </a>
                             </li>
                         }
