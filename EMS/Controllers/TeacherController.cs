@@ -320,5 +320,23 @@ namespace EMS.Controllers
 
             return View(await studentsQuery.ToListAsync());
         }
+
+        //Student Details showing in Teacher side
+        // GET: Teacher/StudentDetails/string_id
+        public async Task<IActionResult> StudentDetails(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return NotFound();
+
+            var student = await _context.Users
+                .Include(u => u.StudentProfile)
+                    .ThenInclude(sp => sp.Department)
+                .Include(u => u.StudentProfile)
+                    .ThenInclude(sp => sp.Semester)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (student == null) return NotFound();
+
+            return View(student);
+        }
     }
 }

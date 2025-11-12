@@ -1,0 +1,62 @@
+﻿@model IEnumerable<EMS.Models.ViewModels.StudentAttendanceViewModel>
+
+@{
+    ViewData["Title"] = "My Attendance Report";
+}
+
+<h2 class="mb-4"><i class="fa-solid fa-chart-pie text-info"></i> Attendance Report</h2>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle text-center">
+            <thead class="bg-light">
+                <tr>
+                    <th class="text-start">Course</th>
+                    <th>Total Classes</th>
+                    <th class="text-success">Present</th>
+                    <th class="text-warning">Late</th>
+                    <th class="text-danger">Absent</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="text-start">
+                                <span class="fw-bold text-primary">@item.CourseCode</span><br />
+                                <small class="text-muted">@item.CourseTitle</small>
+                            </td>
+                            <td><span class="badge bg-secondary">@item.TotalClasses</span></td>
+                            <td>@item.Present</td>
+                            <td>@item.Late</td>
+                            <td>@item.Absent</td>
+                            <td>
+                                @if (item.Percentage >= 75)
+                                {
+                                    <span class="badge bg-success">@item.Percentage%</span>
+                                }
+                                else if (item.Percentage >= 60)
+                                {
+                                    <span class="badge bg-warning text-dark">@item.Percentage%</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">@item.Percentage%</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-muted py-4">No attendance records found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

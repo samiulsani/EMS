@@ -76,6 +76,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link @(currentController == "Admin" && currentAction == "ManageAttendance" ? "active" : "")"
+                                   asp-controller="Admin" asp-action="ManageAttendance">
+                                    <i class="fa-solid fa-calendar-check me-2"></i> Attendance
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link @(currentController == "Notices" ? "active" : "")"
                                    asp-controller="Notices" asp-action="Index">
                                     <i class="fa-solid fa-bullhorn me-2"></i> Notice Board
@@ -102,6 +108,13 @@
                                 <a class="nav-link @(currentController == "Student" && currentAction == "MyCourses" ? "active" : "")"
                                    asp-controller="Student" asp-action="MyCourses">
                                     <i class="fa-solid fa-book-open me-2"></i> My Courses
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "Student" && currentAction == "MyAttendance" ? "active" : "")"
+                                   asp-controller="Student" asp-action="MyAttendance">
+                                    <i class="fa-solid fa-chart-pie me-2"></i> Attendance Report
                                 </a>
                             </li>
 

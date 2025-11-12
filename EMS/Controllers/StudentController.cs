@@ -1,5 +1,6 @@
 ﻿using EMS.Data;
 using EMS.Models;
+using EMS.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -96,6 +97,35 @@ namespace EMS.Controllers
             if (notice == null) return NotFound();
 
             return View(notice);
+        }
+
+
+        // Student Attendance Report
+        // GET: Student/MyAttendance
+        public async Task<IActionResult> MyAttendance()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // ১. এই স্টুডেন্টের সব অ্যাটেনডেন্স রেকর্ড আনো
+            var records = await _context.StudentAttendances
+                .Include(a => a.Course)
+                .Where(a => a.StudentId == userId)
+                .ToListAsync();
+
+            // ২. কোর্স অনুযায়ী গ্রুপ করে রিপোর্ট তৈরি করো
+            var model = records.GroupBy(r => r.Course)
+                .Select(g => new StudentAttendanceViewModel
+                {
+                    CourseCode = g.Key.CourseCode,
+                    CourseTitle = g.Key.Title,
+                    TotalClasses = g.Count(),
+                    Present = g.Count(x => x.Status == AttendanceStatus.Present),
+                    Late = g.Count(x => x.Status == AttendanceStatus.Late),
+                    Absent = g.Count(x => x.Status == AttendanceStatus.Absent)
+                })
+                .ToList();
+
+            return View(model);
         }
     }
 }

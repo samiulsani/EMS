@@ -1,0 +1,78 @@
+﻿@model EMS.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Student Profile";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-primary"><i class="fa-solid fa-user-graduate"></i> Student Profile</h2>
+    <a href="javascript:history.back()" class="btn btn-outline-secondary">
+        <i class="fa-solid fa-arrow-left"></i> Back
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow-sm text-center h-100 border-primary">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mb-3" style="width: 120px; height: 120px;">
+                    <i class="fa-solid fa-user fa-4x text-secondary"></i>
+                </div>
+                <h4 class="card-title text-primary fw-bold">@Model.FirstName @Model.LastName</h4>
+                <p class="text-muted mb-1">@Model.Email</p>
+                <span class="badge bg-success fs-6">@Model.StudentProfile?.StudentRoll</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light fw-bold">
+                Academic & Personal Information
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="small text-muted">Registration No</label>
+                        <p class="fw-bold">@Model.StudentProfile?.RegistrationNo</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="small text-muted">Session</label>
+                        <p class="fw-bold">@Model.StudentProfile?.Session</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="small text-muted">Department</label>
+                        <p class="fw-bold">@Model.StudentProfile?.Department?.Name</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="small text-muted">Current Semester</label>
+                        <p class="fw-bold">@Model.StudentProfile?.Semester?.Name</p>
+                    </div>
+
+                    <hr class="my-2 text-muted" />
+
+                    <div class="col-md-6">
+                        <label class="small text-muted">Phone Number</label>
+                        <p class="fw-bold">@Model.PhoneNumber</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="small text-muted">Blood Group</label>
+                        <p class="fw-bold">@(Model.StudentProfile?.BloodGroup ?? "N/A")</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="small text-muted">Father's Name</label>
+                        <p class="fw-bold">@Model.StudentProfile?.FatherName</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="small text-muted">Mother's Name</label>
+                        <p class="fw-bold">@Model.StudentProfile?.MotherName</p>
+                    </div>
+                    <div class="col-12">
+                        <label class="small text-muted">Address</label>
+                        <p class="fw-bold">@Model.StudentProfile?.Address</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

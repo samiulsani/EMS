@@ -69,9 +69,9 @@
                                 <i class="fa-solid fa-envelope small text-muted"></i> @student.Email
                             </td>
                             <td class="text-end">
-                                <button class="btn btn-sm btn-outline-info" title="View Profile (Soon)">
-                                    <i class="fa-solid fa-user"></i>
-                                </button>
+                                <a asp-action="StudentDetails" asp-route-id="@student.Id" class="btn btn-sm btn-outline-info" title="View Profile">
+                                    <i class="fa-solid fa-user"></i> Profile
+                                </a>
                             </td>
                         </tr>
                     }

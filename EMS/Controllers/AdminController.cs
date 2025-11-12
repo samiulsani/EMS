@@ -1,6 +1,7 @@
 ﻿using EMS.Data;
 using EMS.Models;
 using EMS.Models.ViewModels;
+using EMS.Models.ViewModels.Teacher;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -497,6 +498,96 @@ namespace EMS.Controllers
                 .ToListAsync();
 
             return View(teachers);
+        }
+
+
+        // Admin এর জন্য অ্যাটেনডেন্স ম্যানেজমেন্ট
+        // GET: Admin/ManageAttendance
+        public async Task<IActionResult> ManageAttendance(int? courseId, DateTime? date)
+        {
+            var attendanceDate = date ?? DateTime.Now;
+
+            // ১. সব কোর্স লোড করো (অ্যাডমিনের জন্য সব ওপেন)
+            var courses = await _context.Courses
+                .Include(c => c.Department)
+                .Include(c => c.Semester)
+                .OrderBy(c => c.Department.Name)
+                .ThenBy(c => c.Semester.Name)
+                .ToListAsync();
+
+            // ড্রপডাউন পপুলেট করা
+            ViewBag.CourseList = new SelectList(courses.Select(c => new {
+                Id = c.Id,
+                Title = $"{c.CourseCode} - {c.Title} ({c.Department?.Name})"
+            }), "Id", "Title", courseId);
+
+            if (courseId == null)
+            {
+                return View(new AttendanceViewModel { Date = attendanceDate });
+            }
+
+            // ২. স্টুডেন্ট এবং অ্যাটেনডেন্স লোড করা (টিচারের মতোই)
+            var selectedCourse = courses.FirstOrDefault(c => c.Id == courseId);
+            var students = await _context.Users
+                .Include(u => u.StudentProfile)
+                .Where(u => u.StudentProfile != null &&
+                            u.StudentProfile.DepartmentId == selectedCourse.DepartmentId &&
+                            u.StudentProfile.SemesterId == selectedCourse.SemesterId)
+                .OrderBy(u => u.StudentProfile.StudentRoll)
+                .ToListAsync();
+
+            var existingAttendance = await _context.StudentAttendances
+                .Where(a => a.CourseId == courseId && a.Date.Date == attendanceDate.Date)
+                .ToListAsync();
+
+            var model = new AttendanceViewModel
+            {
+                CourseId = selectedCourse.Id,
+                CourseTitle = selectedCourse.Title,
+                CourseCode = selectedCourse.CourseCode,
+                Date = attendanceDate,
+                Students = students.Select(s => {
+                    var record = existingAttendance.FirstOrDefault(a => a.StudentId == s.Id);
+                    return new StudentAttendanceRow
+                    {
+                        StudentId = s.Id,
+                        StudentName = $"{s.FirstName} {s.LastName}",
+                        RollNo = s.StudentProfile.StudentRoll,
+                        Status = record != null ? record.Status : AttendanceStatus.Present
+                    };
+                }).ToList()
+            };
+
+            return View(model);
+        }
+
+        // POST: Admin/ManageAttendance
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ManageAttendance(AttendanceViewModel model)
+        {
+            // আগের রেকর্ড মুছে নতুন করে সেভ করা (টিচারের মতোই লজিক)
+            var existingRecords = await _context.StudentAttendances
+                .Where(a => a.CourseId == model.CourseId && a.Date.Date == model.Date.Date)
+                .ToListAsync();
+
+            if (existingRecords.Any()) _context.StudentAttendances.RemoveRange(existingRecords);
+
+            foreach (var item in model.Students)
+            {
+                var attendance = new StudentAttendance
+                {
+                    CourseId = model.CourseId,
+                    StudentId = item.StudentId,
+                    Date = model.Date,
+                    Status = item.Status
+                };
+                _context.StudentAttendances.Add(attendance);
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Attendance updated successfully!";
+            return RedirectToAction("ManageAttendance", new { courseId = model.CourseId, date = model.Date });
         }
 
     }
