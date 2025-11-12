@@ -1,75 +1,117 @@
 ﻿@model IEnumerable<EMS.Models.Course>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Courses List";
 }
 
-<h1>Index</h1>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Courses Management</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a asp-action="Create" class="btn btn-sm btn-primary">
+            <i class="fa-solid fa-plus"></i> Create New Course
+        </a>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CourseCode)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Credits)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Department)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Semester)
-            </th>
-            <th>Assigned Teacher</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CourseCode)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Credits)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Department.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Semester.Name)
-                </td>
-                <td>
-                    @if (item.Teacher != null)
-                    {
-                        <span class="badge bg-success">@item.Teacher.FirstName @item.Teacher.LastName</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-warning text-dark">Not Assigned</span>
-                    }
-                </td>
-                <td>
-                    @* <a asp-action="AssignTeacher" asp-route-id="@item.Id" class="btn btn-sm btn-outline-dark mb-1" title="Assign Teacher">
-                        <i class="fa-solid fa-chalkboard-user"></i> Assign
-                    </a> *@
+<div class="card mb-4 shadow-sm bg-light">
+    <div class="card-body py-3">
+        <form asp-action="Index" method="get">
+            <div class="row g-3 align-items-end">
 
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold small">Search</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Course Name, Code or Teacher..." />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small">Department</label>
+                    <select name="departmentId" class="form-select" asp-items="ViewBag.DepartmentId">
+                        <option value="">All Departments</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small">Semester</label>
+                    <select name="semesterId" class="form-select" asp-items="ViewBag.SemesterId">
+                        <option value="">All Semesters</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 text-end">
+                    <button type="submit" class="btn btn-primary w-100 mb-2">
+                        <i class="fa-solid fa-filter"></i> Filter
+                    </button>
+                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary w-100">
+                        <i class="fa-solid fa-rotate-right"></i> Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="bg-light">
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.CourseCode)</th>
+                    <th>@Html.DisplayNameFor(model => model.Title)</th>
+                    <th>@Html.DisplayNameFor(model => model.Credits)</th>
+                    <th>@Html.DisplayNameFor(model => model.Department)</th>
+                    <th>@Html.DisplayNameFor(model => model.Semester)</th>
+                    <th>Assigned Teacher</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-5">
+                            <i class="fa-solid fa-book-open fa-2x mb-3"></i>
+                            <p class="mb-0">No courses found matching your criteria.</p>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-primary">@Html.DisplayFor(modelItem => item.CourseCode)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                            <td><span class="badge bg-secondary">@item.Credits Cr.</span></td>
+                            <td>@Html.DisplayFor(modelItem => item.Department.Name)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Semester.Name)</td>
+
+                            <td>
+                                @if (item.Teacher != null)
+                                {
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa-solid fa-chalkboard-user me-2 text-success"></i>
+                                        <span>@item.Teacher.FirstName @item.Teacher.LastName</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-dark border">Unassigned</span>
+                                }
+                            </td>
+
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info" title="Details"><i class="fa-solid fa-eye"></i></a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

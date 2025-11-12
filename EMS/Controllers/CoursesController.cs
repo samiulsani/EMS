@@ -21,12 +21,50 @@ namespace EMS.Controllers
             _context = context;
         }
 
+        // Couses এর জন্য Index অ্যাকশন মেথডে সার্চ এবং ফিল্টারিং লজিক
         // GET: Courses
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, int? departmentId, int? semesterId)
         {
-            var applicationDbContext = _context.Courses.Include(c => c.Department).Include(c => c.Semester).Include(c => c.Teacher);
-            return View(await applicationDbContext.ToListAsync());
+            // ১. বেসিক কুয়েরি তৈরি (সব রিলেশনশিপসহ)
+            var coursesQuery = _context.Courses
+                .Include(c => c.Department)
+                .Include(c => c.Semester)
+                .Include(c => c.Teacher) // টিচারের নাম দিয়ে সার্চ করার জন্য এটা লাগবে
+                .AsQueryable();
+
+            // ২. সার্চ লজিক (কোর্সের নাম, কোড অথবা টিচারের নাম দিয়ে সার্চ)
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                coursesQuery = coursesQuery.Where(c =>
+                    c.Title.Contains(searchString) ||
+                    c.CourseCode.Contains(searchString) ||
+                    (c.Teacher != null && (c.Teacher.FirstName.Contains(searchString) || c.Teacher.LastName.Contains(searchString)))
+                );
+            }
+
+            // ৩. ডিপার্টমেন্ট ফিল্টার
+            if (departmentId.HasValue)
+            {
+                coursesQuery = coursesQuery.Where(c => c.DepartmentId == departmentId);
+            }
+
+            // ৪. সেমিস্টার ফিল্টার
+            if (semesterId.HasValue)
+            {
+                coursesQuery = coursesQuery.Where(c => c.SemesterId == semesterId);
+            }
+
+            // ৫. ড্রপডাউনগুলোর জন্য ডেটা লোড করা (ফিল্টার ভ্যালু মনে রাখার জন্য)
+            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Name", departmentId);
+            ViewData["SemesterId"] = new SelectList(_context.Semesters, "Id", "Name", semesterId);
+
+            // সার্চ ভ্যালু মনে রাখার জন্য
+            ViewData["CurrentFilter"] = searchString;
+
+            // ৬. ফাইনাল রেজাল্ট
+            return View(await coursesQuery.ToListAsync());
         }
+
 
         // GET: Courses/Details/5
         public async Task<IActionResult> Details(int? id)
