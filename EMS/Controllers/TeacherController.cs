@@ -55,7 +55,6 @@ namespace EMS.Controllers
                 Email = teacher.Email,
                 Phone = teacher.PhoneNumber,
 
-                // নতুন ডেটা
                 TotalAssignedCourses = assignedCourses.Count, // কোর্সের সংখ্যা
                 AssignedCourses = assignedCourses,             // কোর্সের লিস্ট
 

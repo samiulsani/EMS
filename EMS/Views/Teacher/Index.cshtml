@@ -36,32 +36,38 @@
     <div class="col-md-7">
         <div class="row g-3 mb-4">
 
-            <div class="card shadow-sm mt-4">
+            <div class="card shadow-sm mb-4">
                 <div class="card-header bg-warning text-dark">
                     <h5 class="mb-0"><i class="fa-solid fa-bullhorn me-2"></i> Notice Board</h5>
                 </div>
                 <div class="card-body p-0">
                     @if (Model.Notices.Any())
                     {
-                        <ul class="list-group list-group-flush">
+                        <div class="list-group list-group-flush">
                             @foreach (var notice in Model.Notices)
                             {
-                                <li class="list-group-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6 class="mb-1 text-primary">@notice.Title</h6>
+                                <a asp-action="NoticeDetails" asp-route-id="@notice.Id" class="list-group-item list-group-item-action flex-column align-items-start">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1 text-primary fw-bold">@notice.Title</h6>
                                         <small class="text-muted">@notice.PostedDate.ToString("dd MMM")</small>
                                     </div>
-                                    <p class="mb-0 small text-secondary text-truncate">@notice.Description</p>
-                                </li>
+                                    <p class="mb-1 small text-secondary">
+                                        @(notice.Description.Length > 80 ? notice.Description.Substring(0, 80) + "..." : notice.Description)
+                                    </p>
+                                    <small class="text-info">Click for details</small>
+                                </a>
                             }
-                        </ul>
+                        </div>
                     }
                     else
                     {
                         <div class="p-4 text-center text-muted">
-                            <p class="mb-0">No notices for teachers at the moment.</p>
+                            <p class="mb-0">No notices at the moment.</p>
                         </div>
                     }
+                </div>
+                <div class="card-footer text-center bg-white">
+                    <a asp-action="Notices" class="btn btn-sm btn-outline-secondary">View All Notices</a>
                 </div>
             </div>
 
