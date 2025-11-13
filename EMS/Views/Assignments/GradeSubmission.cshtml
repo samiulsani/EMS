@@ -59,3 +59,56 @@
         </div>
     </div>
 </div>
+
+<div class="card mb-4 shadow-sm border-info">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fa-solid fa-robot"></i> AI Analysis Report</h5>
+        <span class="badge bg-white text-info">Powered by Gemini</span>
+    </div>
+    <div class="card-body">
+        <div class="row text-center">
+
+            <div class="col-md-4 border-end">
+                <h6 class="text-muted">Suggested Marks</h6>
+                <div class="display-6 fw-bold text-primary">@Model.AIMarks</div>
+                <small class="text-muted">out of @Model.Assignment.TotalMarks</small>
+            </div>
+
+            <div class="col-md-4 border-end">
+                <h6 class="text-muted">AI Content Probability</h6>
+
+                @if (Model.AIPlagiarismScore >= 80)
+                {
+                    <div class="display-6 fw-bold text-danger">@Model.AIPlagiarismScore%</div>
+                    <span class="badge bg-danger">High Risk! 🚨</span>
+                }
+                else if (Model.AIPlagiarismScore >= 50)
+                {
+                    <div class="display-6 fw-bold text-warning">@Model.AIPlagiarismScore%</div>
+                    <span class="badge bg-warning text-dark">Moderate</span>
+                }
+                else
+                {
+                    <div class="display-6 fw-bold text-success">@Model.AIPlagiarismScore%</div>
+                    <span class="badge bg-success">Original Content</span>
+                }
+            </div>
+
+            <div class="col-md-4 text-start ps-4">
+                <h6 class="text-muted">AI Feedback:</h6>
+                <p class="fst-italic small">"@Model.AIReview"</p>
+
+                <button type="button" class="btn btn-sm btn-outline-dark w-100 mt-2" onclick="applyAIMarks()">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Apply Suggestion
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function applyAIMarks() {
+        document.querySelector('input[name="marks"]').value = '@Model.AIMarks';
+        document.querySelector('textarea[name="feedback"]').value = '@Model.AIReview';
+    }
+</script>

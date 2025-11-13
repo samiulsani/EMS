@@ -6,21 +6,28 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
+using UglyToad.PdfPig; // PDF পড়ার জন্য
+using System.Text;     // টেক্সট প্রসেসিং
+using System.Net.Http; // ইন্টারনেটে রিকোয়েস্ট পাঠানোর জন্য
+using System.Text.Json; // JSON ডেটা হ্যান্ডেল করার জন্য
+using System.Text.Json.Nodes; // JSON থেকে ডেটা বের করার জন্য
 
 namespace EMS.Controllers
 {
     [Authorize(Roles = "Student")] // শুধুমাত্র স্টুডেন্টরা এই কন্ট্রোলারে ঢুকতে পারবে
     public class StudentController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ApplicationDbContext _context; // ডাটাবেস কনটেক্সট
+        private readonly UserManager<ApplicationUser> _userManager; // ইউজার ম্যানেজমেন্টের জন্য
+        private readonly IWebHostEnvironment _webHostEnvironment; // ওয়েব হোস্ট এনভায়রনমেন্ট, ফাইল আপলোডের জন্য
+        private readonly IConfiguration _configuration; // কনফিগারেশন সেটিংসের জন্য
 
-        public StudentController(ApplicationDbContext context,UserManager<ApplicationUser> userManager,IWebHostEnvironment webHostEnvironment)
+        public StudentController(ApplicationDbContext context,UserManager<ApplicationUser> userManager,IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
         {
             _context = context;
             _userManager = userManager;
             _webHostEnvironment = webHostEnvironment; // যদি ভবিষ্যতে ফাইল আপলোড বা ডাউনলোডের প্রয়োজন হয়
+            _configuration = configuration; // কনফিগারেশন সেটিংসের জন্য
         }
 
         public async Task<IActionResult> Index()
@@ -227,13 +234,47 @@ namespace EMS.Controllers
                 await file.CopyToAsync(fileStream);
             }
 
+            // --- AI Integration
+            double? aiMarks = null;
+            string? aiReview = null;
+            double? aiPlagiarism = null;
+
+            // শুধু PDF ফাইল হলে AI চেক করবে
+            if (Path.GetExtension(file.FileName).ToLower() == ".pdf")
+            {
+                // ১. টেক্সট বের করো
+                string pdfContent = ExtractTextFromPdf(filePath); // filePath হলো যেখানে ফাইল সেভ করেছো
+                var assignment = await _context.Assignments.FindAsync(id);
+
+                // ২. যদি পর্যাপ্ত টেক্সট থাকে, তবে জেমিনিকে পাঠাও
+                if (!string.IsNullOrEmpty(pdfContent) && pdfContent.Length > 50)
+                {
+                    var aiResult = await GetGeminiAnalysis(pdfContent, assignment.Title, assignment.TotalMarks);
+
+                    aiMarks = aiResult.marks;
+                    aiReview = aiResult.feedback;
+                    aiPlagiarism = aiResult.ai_probability; // প্লাগিয়ারিজম স্কোর
+                }
+                else
+                {
+                    aiReview = "File content too short or unreadable for AI.";
+                }
+            }
+
+
+
             // ৫. ডেটাবেসে সেভ করা
             var submission = new AssignmentSubmission
             {
                 AssignmentId = id,
-                StudentId = userId,
-                FileUrl = "/uploads/assignments/" + uniqueFileName, // ফোল্ডারের রিলেটিভ পাথ
-                SubmissionDate = DateTime.Now
+                StudentId = _userManager.GetUserId(User),
+                FileUrl = "/uploads/assignments/" + uniqueFileName,
+                SubmissionDate = DateTime.Now,
+
+                // AI ডেটা
+                AIMarks = aiMarks,
+                AIReview = aiReview,
+                AIPlagiarismScore = aiPlagiarism
             };
 
             _context.AssignmentSubmissions.Add(submission);
@@ -241,6 +282,113 @@ namespace EMS.Controllers
 
             TempData["SuccessMessage"] = "Assignment submitted successfully!";
             return RedirectToAction(nameof(Assignments));
+        }
+
+        // AI ভিত্তিক গ্রেডিং এবং রিভিউ ফাংশন 
+        // ১. পিডিএফ থেকে লেখা বের করার ফাংশন
+        private string ExtractTextFromPdf(string filePath)
+        {
+            try
+            {
+                using (var pdf = PdfDocument.Open(filePath))
+                {
+                    var sb = new StringBuilder();
+                    foreach (var page in pdf.GetPages())
+                    {
+                        sb.Append(page.Text + " ");
+                    }
+                    return sb.ToString();
+                }
+            }
+            catch { return ""; }
+        }
+
+        // ২. জেমিনি (AI) ডাকার ফাংশন
+        // ডিবাগিং-এর জন্য ক্লাস আপডেট
+        private class AIResultDTO
+        {
+            public double marks { get; set; }
+            public string feedback { get; set; }
+            public double ai_probability { get; set; }
+        }
+
+        private async Task<AIResultDTO> GetGeminiAnalysis(string studentAnswer, string assignmentTitle, double totalMarks)
+        {
+            // ১. তোমার API Key
+            string apiKey = "AIzaSyCOqRtW4e5q_c3_L-ZiGB-v3BgmjLh9_Zk";
+
+            string apiUrl = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key={apiKey}";
+
+            var prompt = $@"
+            Act as a strict university professor.
+            Assignment Title: {assignmentTitle}
+            Total Marks: {totalMarks}
+            
+            Student's Submission (extracted text):
+            ---
+            {studentAnswer}
+            ---
+            
+            Your Task:
+            1. Grade the submission out of {totalMarks}.
+            2. Provide a short feedback (max 3 sentences).
+            3. Analyze the writing style for AI generation probability (0-100).
+            
+            Return ONLY a JSON object in this format (no markdown, no ```json):
+            {{ ""marks"": 0, ""feedback"": ""text"", ""ai_probability"": 0 }}
+        ";
+
+            var requestBody = new
+            {
+                contents = new[] { new { parts = new[] { new { text = prompt } } } }
+            };
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    var jsonContent = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(apiUrl, jsonContent);
+
+                    var resultJson = await response.Content.ReadAsStringAsync();
+
+                    // ডিবাগিং: যদি এখনো এরর দেয়, আমরা দেখবো
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        return new AIResultDTO
+                        {
+                            marks = 0,
+                            feedback = $"API Error: {response.StatusCode} - {resultJson}",
+                            ai_probability = 0
+                        };
+                    }
+
+                    var jsonNode = JsonNode.Parse(resultJson);
+                    var aiText = jsonNode?["candidates"]?[0]?["content"]?["parts"]?[0]?["text"]?.ToString();
+
+                    if (string.IsNullOrEmpty(aiText))
+                    {
+                        return new AIResultDTO { marks = 0, feedback = "AI returned empty response.", ai_probability = 0 };
+                    }
+
+                    // ক্লিন করা
+                    aiText = aiText.Replace("```json", "").Replace("```", "").Trim();
+
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var result = JsonSerializer.Deserialize<AIResultDTO>(aiText, options);
+
+                    return result ?? new AIResultDTO { marks = 0, feedback = "JSON Parsing returned null.", ai_probability = 0 };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new AIResultDTO
+                {
+                    marks = 0,
+                    feedback = $"System Error: {ex.Message}",
+                    ai_probability = 0
+                };
+            }
         }
     }
 }

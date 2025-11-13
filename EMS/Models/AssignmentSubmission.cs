@@ -18,9 +18,10 @@ namespace EMS.Models
 
         public string? TeacherFeedback { get; set; }
 
-        // --- AI ইন্টিগ্রেশন ফিল্ড (ভবিষ্যতের জন্য) ---
-        public double? AIMarks { get; set; } // AI-এর দেওয়া মার্কস
-        public string? AIReview { get; set; } // AI-এর দেওয়া মতামত
+        // --- AI ইন্টিগ্রেশন ফিল্ড ---
+        public double? AIMarks { get; set; }       // AI-এর দেওয়া মার্কস
+        public string? AIReview { get; set; }      // AI-এর ফিডব্যাক
+        public double? AIPlagiarismScore { get; set; } // AI কপির সম্ভাবনা (%)
 
         // --- সম্পর্ক ---
         [Required]
