@@ -168,6 +168,7 @@ namespace EMS.Controllers
 
         // Student Assignments Section 
         // GET: Student/Assignments
+        // GET: Student/Assignments
         public async Task<IActionResult> Assignments()
         {
             var userId = _userManager.GetUserId(User);
@@ -175,22 +176,40 @@ namespace EMS.Controllers
 
             if (student?.StudentProfile == null) return NotFound();
 
-            // স্টুডেন্টের সেমিস্টার এবং ডিপার্টমেন্টের অ্যাসাইনমেন্টগুলো লোড করো
+            // ১. অ্যাসাইনমেন্টগুলো লোড করো
             var assignments = await _context.Assignments
                 .Include(a => a.Course)
                 .Where(a => a.Course.DepartmentId == student.StudentProfile.DepartmentId &&
                             a.Course.SemesterId == student.StudentProfile.SemesterId)
-                .OrderByDescending(a => a.Deadline)
                 .ToListAsync();
 
-            // স্টুডেন্ট কোনগুলো সাবমিট করেছে তা জানার জন্য সাবমিশন লিস্টও লোড করছি
+            // ২. সাবমিশনগুলো লোড করো
             var mySubmissions = await _context.AssignmentSubmissions
                 .Where(s => s.StudentId == userId)
                 .ToListAsync();
 
-            ViewBag.MySubmissions = mySubmissions; // ভিউতে পাঠানোর জন্য
+            ViewBag.MySubmissions = mySubmissions;
 
-            return View(assignments);
+            // ৩. সাজানোর লজিক (Sorting Logic)
+            var sortedAssignments = assignments
+                .OrderBy(a =>
+                {
+                    bool isSubmitted = mySubmissions.Any(s => s.AssignmentId == a.Id);
+                    bool isExpired = a.Deadline < DateTime.Now;
+
+                    // লজিক: 
+                    // - যদি সাবমিট করা হয় = ১ (নিচে যাবে)
+                    // - যদি সাবমিট না করা হয় কিন্তু মেয়াদ শেষ = ২ (সবার শেষে যাবে)
+                    // - যদি সাবমিট না করা হয় এবং মেয়াদ থাকে = ০ (সবার উপরে থাকবে)
+
+                    if (isSubmitted) return 1;
+                    if (isExpired) return 2;
+                    return 0; // Active Pending
+                })
+                .ThenByDescending(a => a.CreatedDate) // এরপর নতুন অ্যাসাইনমেন্ট আগে দেখাবে
+                .ToList();
+
+            return View(sortedAssignments);
         }
 
         // GET: Student/SubmitAssignment/5
@@ -243,7 +262,7 @@ namespace EMS.Controllers
             if (Path.GetExtension(file.FileName).ToLower() == ".pdf")
             {
                 // ১. টেক্সট বের করো
-                string pdfContent = ExtractTextFromPdf(filePath); // filePath হলো যেখানে ফাইল সেভ করেছো
+                string pdfContent = ExtractTextFromPdf(filePath); // filePath
                 var assignment = await _context.Assignments.FindAsync(id);
 
                 // ২. যদি পর্যাপ্ত টেক্সট থাকে, তবে জেমিনিকে পাঠাও
@@ -316,7 +335,7 @@ namespace EMS.Controllers
         {
             // ১. appsettings.json থেকে Key এবং URL নেওয়া
             string apiKey = _configuration["Gemini:ApiKey"];
-            string baseUrl = _configuration["Gemini:ModelUrl"]; // যেমন: .../models/gemini-2.0-flash-lite:generateContent
+            string baseUrl = _configuration["Gemini:ModelUrl"];
 
             if (string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(baseUrl))
             {
