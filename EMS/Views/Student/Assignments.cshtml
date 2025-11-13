@@ -1,0 +1,98 @@
+﻿@model IEnumerable<EMS.Models.Assignment>
+
+@{
+    ViewData["Title"] = "Assignments";
+    var submissions = ViewBag.MySubmissions as List<EMS.Models.AssignmentSubmission>;
+}
+
+<h2 class="mb-4"><i class="fa-solid fa-list-check text-primary"></i> Assignments</h2>
+
+<div class="row">
+    @if (Model.Any())
+    {
+        @foreach (var item in Model)
+        {
+            var submitted = submissions?.FirstOrDefault(s => s.AssignmentId == item.Id);
+            bool isExpired = item.Deadline < DateTime.Now;
+
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm h-100 @(isExpired ? "border-danger" : "border-success")">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Course: <strong>@item.Course.CourseCode</strong></small>
+                        @if (submitted != null)
+                        {
+                            <div class="alert alert-success py-2 mb-0">
+                                <small><i class="fa-solid fa-check-circle"></i> Submitted on @submitted.SubmissionDate.ToString("dd MMM")</small>
+
+                                @if (submitted.MarksObtained != null)
+                                {
+                                    <div class="mt-2 border-top pt-2">
+                                        <strong>Result:</strong> <span class="badge bg-primary fs-6">@submitted.MarksObtained / @item.TotalMarks</span>
+                                        @if (!string.IsNullOrEmpty(submitted.TeacherFeedback))
+                                        {
+                                            <div class="mt-1 small text-muted fst-italic">
+                                                " @submitted.TeacherFeedback "
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="mt-1 small text-warning">
+                                        <i class="fa-solid fa-clock"></i> Waiting for grading...
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else if (isExpired)
+                        {
+                            <span class="badge bg-danger">Expired</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        }
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Title</h5>
+                        <p class="card-text text-muted small">
+                            Deadline: @item.Deadline.ToString("dd MMM yyyy, h:mm tt")
+                        </p>
+                        <hr />
+                        <p class="card-text">@(item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)</p>
+
+                        @if (submitted == null && !isExpired)
+                        {
+                            <a asp-action="SubmitAssignment" asp-route-id="@item.Id" class="btn btn-primary w-100">
+                                <i class="fa-solid fa-upload"></i> Submit Now
+                            </a>
+                        }
+                        else if (submitted != null)
+                        {
+                            <div class="alert alert-success py-2 mb-0 text-center">
+                                <small><i class="fa-solid fa-check-circle"></i> Submitted on @submitted.SubmissionDate.ToString("dd MMM")</small>
+                                @if (submitted.MarksObtained != null)
+                                {
+                                    <br />
+                    
+                                    <strong>Marks: @submitted.MarksObtained / @item.TotalMarks</strong>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary w-100" disabled>Submission Closed</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center text-muted py-5">
+            <i class="fa-solid fa-clipboard-check fa-3x mb-3"></i>
+            <h4>No assignments available.</h4>
+        </div>
+    }
+</div>

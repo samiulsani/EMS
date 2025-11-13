@@ -1,0 +1,61 @@
+﻿@model EMS.Models.AssignmentSubmission
+
+@{
+    ViewData["Title"] = "Grade Submission";
+    Layout = "_DashboardLayout";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fa-solid fa-pen-ruler"></i> Grade Submission</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-secondary">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Student:</strong> @Model.Student.FirstName @Model.Student.LastName <br />
+                            <strong>ID:</strong> @(Model.Student.StudentProfile?.StudentRoll ?? "N/A")
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <strong>Assignment:</strong> @Model.Assignment.Title <br />
+                            <strong>Total Marks:</strong> @Model.Assignment.TotalMarks
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <a href="@Model.FileUrl" target="_blank" class="btn btn-outline-primary">
+                            <i class="fa-solid fa-file-pdf"></i> View/Download Student's File
+                        </a>
+                    </div>
+                </div>
+
+                <form asp-action="GradeSubmission" method="post">
+                    <input type="hidden" name="id" value="@Model.Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Marks Awarded</label>
+                        <div class="input-group">
+                            <input type="number" name="marks" step="0.5" min="0" max="@Model.Assignment.TotalMarks"
+                                   class="form-control" value="@(Model.MarksObtained ?? 0)" required />
+                            <span class="input-group-text">/ @Model.Assignment.TotalMarks</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Feedback / Comments</label>
+                        <textarea name="feedback" class="form-control" rows="4" placeholder="Optional feedback for the student...">@Model.TeacherFeedback</textarea>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa-solid fa-save"></i> Save Grade
+                        </button>
+                        <a asp-action="Submissions" asp-route-id="@Model.AssignmentId" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

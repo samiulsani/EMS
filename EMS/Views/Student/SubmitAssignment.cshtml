@@ -1,0 +1,41 @@
+﻿@model EMS.Models.Assignment
+
+@{
+    ViewData["Title"] = "Submit Assignment";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fa-solid fa-file-upload"></i> Submit Assignment</h4>
+            </div>
+            <div class="card-body">
+                <h5>@Model.Title</h5>
+                <p class="text-muted">Course: @Model.Course.CourseCode | Deadline: @Model.Deadline.ToString("dd MMM yyyy, h:mm tt")</p>
+
+                <div class="alert alert-info">
+                    <strong>Instructions:</strong> <br />
+                    @Html.Raw(Model.Description.Replace("\n", "<br>"))
+                </div>
+
+                <form asp-action="SubmitAssignment" enctype="multipart/form-data" method="post">
+                    <input type="hidden" name="id" value="@Model.Id" />
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Upload File (PDF/Doc)</label>
+                        <input type="file" name="file" class="form-control" required accept=".pdf,.doc,.docx" />
+                        <div class="form-text">Max file size: 5MB. Only PDF or Word documents allowed.</div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fa-solid fa-paper-plane"></i> Submit
+                        </button>
+                        <a asp-action="Assignments" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

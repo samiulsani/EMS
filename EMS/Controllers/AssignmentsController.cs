@@ -112,10 +112,12 @@ namespace EMS.Controllers
             // সাবমিশন লিস্ট লোড করো
             var submissions = await _context.AssignmentSubmissions
                 .Include(s => s.Student)
+                .ThenInclude(u => u.StudentProfile)
                 .Where(s => s.AssignmentId == id)
                 .ToListAsync();
 
             ViewBag.AssignmentTitle = assignment.Title;
+            ViewBag.TotalMarks = assignment.TotalMarks;
             return View(submissions);
         }
 
@@ -212,6 +214,51 @@ namespace EMS.Controllers
             if (assignment == null) return NotFound();
 
             return View(assignment);
+        }
+
+        // GET & POST: Assignments/GradeSubmission/5
+        // GET: Assignments/GradeSubmission/5
+        public async Task<IActionResult> GradeSubmission(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var submission = await _context.AssignmentSubmissions
+                .Include(s => s.Assignment)
+                .Include(s => s.Student)
+                    .ThenInclude(u => u.StudentProfile)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (submission == null) return NotFound();
+
+            return View(submission);
+        }
+
+        // POST: Assignments/GradeSubmission/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GradeSubmission(int id, double marks, string feedback)
+        {
+            var submission = await _context.AssignmentSubmissions
+                .Include(s => s.Assignment)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (submission == null) return NotFound();
+
+            // মার্কস ভ্যালিডেশন
+            if (marks < 0 || marks > submission.Assignment.TotalMarks)
+            {
+                ModelState.AddModelError("", $"Marks must be between 0 and {submission.Assignment.TotalMarks}");
+                return View(submission);
+            }
+
+            // ডেটা আপডেট
+            submission.MarksObtained = marks;
+            submission.TeacherFeedback = feedback;
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Grading completed successfully!";
+            return RedirectToAction("Submissions", new { id = submission.AssignmentId });
         }
     }
 }

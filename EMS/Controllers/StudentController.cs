@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
 
 namespace EMS.Controllers
 {
@@ -13,11 +14,13 @@ namespace EMS.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public StudentController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public StudentController(ApplicationDbContext context,UserManager<ApplicationUser> userManager,IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _userManager = userManager;
+            _webHostEnvironment = webHostEnvironment; // যদি ভবিষ্যতে ফাইল আপলোড বা ডাউনলোডের প্রয়োজন হয়
         }
 
         public async Task<IActionResult> Index()
@@ -154,6 +157,90 @@ namespace EMS.Controllers
             }).ToList();
 
             return View(model);
+        }
+
+        // Student Assignments Section 
+        // GET: Student/Assignments
+        public async Task<IActionResult> Assignments()
+        {
+            var userId = _userManager.GetUserId(User);
+            var student = await _context.Users.Include(u => u.StudentProfile).FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (student?.StudentProfile == null) return NotFound();
+
+            // স্টুডেন্টের সেমিস্টার এবং ডিপার্টমেন্টের অ্যাসাইনমেন্টগুলো লোড করো
+            var assignments = await _context.Assignments
+                .Include(a => a.Course)
+                .Where(a => a.Course.DepartmentId == student.StudentProfile.DepartmentId &&
+                            a.Course.SemesterId == student.StudentProfile.SemesterId)
+                .OrderByDescending(a => a.Deadline)
+                .ToListAsync();
+
+            // স্টুডেন্ট কোনগুলো সাবমিট করেছে তা জানার জন্য সাবমিশন লিস্টও লোড করছি
+            var mySubmissions = await _context.AssignmentSubmissions
+                .Where(s => s.StudentId == userId)
+                .ToListAsync();
+
+            ViewBag.MySubmissions = mySubmissions; // ভিউতে পাঠানোর জন্য
+
+            return View(assignments);
+        }
+
+        // GET: Student/SubmitAssignment/5
+        public async Task<IActionResult> SubmitAssignment(int id)
+        {
+            var assignment = await _context.Assignments
+                .Include(a => a.Course)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (assignment == null) return NotFound();
+
+            return View(assignment);
+        }
+
+        // POST: Student/SubmitAssignment
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitAssignment(int id, IFormFile file)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // ১. ফাইল চেক
+            if (file == null || file.Length == 0)
+            {
+                ModelState.AddModelError("", "Please upload a valid file.");
+                var assignment = await _context.Assignments.Include(a => a.Course).FirstOrDefaultAsync(a => a.Id == id);
+                return View(assignment);
+            }
+
+            // ২. ফাইল সেভ করার ফোল্ডার পাথ তৈরি (wwwroot/uploads/assignments)
+            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "assignments");
+            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+            // ৩. ইউনিক ফাইলের নাম তৈরি (যাতে নাম কনফ্লিক্ট না হয়)
+            string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            // ৪. ফাইল কপি করা
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(fileStream);
+            }
+
+            // ৫. ডেটাবেসে সেভ করা
+            var submission = new AssignmentSubmission
+            {
+                AssignmentId = id,
+                StudentId = userId,
+                FileUrl = "/uploads/assignments/" + uniqueFileName, // ফোল্ডারের রিলেটিভ পাথ
+                SubmissionDate = DateTime.Now
+            };
+
+            _context.AssignmentSubmissions.Add(submission);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Assignment submitted successfully!";
+            return RedirectToAction(nameof(Assignments));
         }
     }
 }

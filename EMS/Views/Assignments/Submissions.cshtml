@@ -12,51 +12,46 @@
 <div class="card shadow-sm">
     <div class="table-responsive">
         <table class="table table-hover mb-0 align-middle">
-            <thead class="bg-light">
-                <tr>
-                    <th>Student Name</th>
-                    <th>Date</th>
-                    <th>File</th>
-                    <th>Marks</th>
-                    <th class="text-end">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Any())
-                {
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.Student.FirstName @item.Student.LastName</td>
-                            <td>@item.SubmissionDate.ToString("dd MMM yyyy, h:mm tt")</td>
-                            <td>
-                                <a href="@item.FileUrl" target="_blank" class="btn btn-sm btn-outline-primary">
-                                    <i class="fa-solid fa-download"></i> Download
-                                </a>
-                            </td>
-                            <td>
-                                @if (item.MarksObtained != null)
-                                {
-                                    <span class="badge bg-success">@item.MarksObtained</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-warning text-dark">Pending</span>
-                                }
-                            </td>
-                            <td class="text-end">
-                                <button class="btn btn-sm btn-success">Grade</button>
-                            </td>
-                        </tr>
+    <thead class="bg-light">
+        <tr>
+            <th>Student Info</th> <th>Date</th>
+            <th>File</th>
+            <th>Marks</th>
+            <th class="text-end">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <div class="fw-bold">@item.Student.FirstName @item.Student.LastName</div>
+                    <small class="text-muted">ID: @(item.Student.StudentProfile?.StudentRoll ?? "N/A")</small>
+                </td>
+                <td>@item.SubmissionDate.ToString("dd MMM, h:mm tt")</td>
+                <td>
+                    <a href="@item.FileUrl" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="fa-solid fa-download"></i> View File
+                    </a>
+                </td>
+                <td>
+                    @if(item.MarksObtained != null) 
+                    { 
+                        <span class="badge bg-success fs-6">@item.MarksObtained / @ViewBag.TotalMarks</span> 
+                    } 
+                    else 
+                    { 
+                        <span class="badge bg-warning text-dark">Pending</span> 
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="5" class="text-center text-muted py-5">No submissions yet.</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                </td>
+                <td class="text-end">
+                    <a asp-action="GradeSubmission" asp-route-id="@item.Id" class="btn btn-sm btn-success">
+                        <i class="fa-solid fa-check-to-slot"></i> Grade
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
     </div>
 </div>
