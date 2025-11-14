@@ -1,80 +1,87 @@
 ﻿@model EMS.Models.Course
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Course";
 }
 
-<h1>Edit</h1>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-warning text-dark py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i> Edit Course</h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Id" />
 
-<h4>Course</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="CourseCode" class="control-label"></label>
-                <input asp-for="CourseCode" class="form-control" />
-                <span asp-validation-for="CourseCode" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Credits" class="control-label"></label>
-                <input asp-for="Credits" class="form-control" />
-                <span asp-validation-for="Credits" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="DepartmentId" class="control-label">Department</label>
-                <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.DepartmentId">
-                    <option value="">-- Select Department --</option>
-                </select>
-                <span asp-validation-for="DepartmentId" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="SemesterId" class="control-label">Semester</label>
-                <select asp-for="SemesterId" class="form-control" asp-items="ViewBag.SemesterId">
-                    <option value="">-- Select Seemester --</option>
-                </select>
-                <span asp-validation-for="SemesterId" class="text-danger"></span>
-            </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CourseCode" class="form-label fw-bold text-muted">Course Code</label>
+                            <input asp-for="CourseCode" class="form-control" />
+                            <span asp-validation-for="CourseCode" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Credits" class="form-label fw-bold text-muted">Credits</label>
+                            <input asp-for="Credits" class="form-control" />
+                            <span asp-validation-for="Credits" class="text-danger small"></span>
+                        </div>
+                    </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="TeacherId" class="control-label">Assign Teacher</label>
-                <select asp-for="TeacherId" class="form-control" id="TeacherId">
-                    <option value="">-- Select Teacher --</option>
-                </select>
-            </div>
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label fw-bold text-muted">Course Title</label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
 
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DepartmentId" class="form-label fw-bold text-muted">Department</label>
+                            <select asp-for="DepartmentId" class="form-select" asp-items="ViewBag.DepartmentId" id="DepartmentId">
+                                <option value="">-- Select Department --</option>
+                            </select>
+                            <span asp-validation-for="DepartmentId" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="SemesterId" class="form-label fw-bold text-muted">Semester</label>
+                            <select asp-for="SemesterId" class="form-select" asp-items="ViewBag.SemesterId">
+                                <option value="">-- Select Semester --</option>
+                            </select>
+                            <span asp-validation-for="SemesterId" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="TeacherId" class="form-label fw-bold text-muted">Assign Teacher</label>
+                        <select asp-for="TeacherId" class="form-select" id="TeacherId">
+                            <option value="">-- Select Teacher --</option>
+                        </select>
+                        <span asp-validation-for="TeacherId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn btn-light text-muted border me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-warning fw-bold px-4">
+                            <i class="fa-solid fa-save me-2"></i> Update
+                        </button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
     <script>
         $(document).ready(function () {
-            var selectedTeacher = '@Model.TeacherId'; // বর্তমান টিচার আইডি
+            var selectedTeacher = '@Model.TeacherId';
 
-            // ফাংশন: টিচার লোড করার জন্য
             function loadTeachers(deptId, selectedId) {
                 var teacherSelect = $("#TeacherId");
-                teacherSelect.empty();
-                teacherSelect.append('<option value="">-- Select Teacher --</option>');
+                teacherSelect.empty().append('<option value="">-- Select Teacher --</option>');
 
                 if (deptId) {
                     $.ajax({
@@ -84,9 +91,7 @@
                         success: function (data) {
                             $.each(data, function (i, teacher) {
                                 var option = $('<option></option>').val(teacher.id).html(teacher.name);
-                                if (teacher.id === selectedId) {
-                                    option.prop('selected', true); // আগে থেকে সিলেক্টেড থাকলে সেট করো
-                                }
+                                if (teacher.id === selectedId) option.prop('selected', true);
                                 teacherSelect.append(option);
                             });
                         }
@@ -94,16 +99,11 @@
                 }
             }
 
-            // ১. পেজ লোড হওয়ার সময় একবার রান করো
             var initialDept = $("#DepartmentId").val();
-            if (initialDept) {
-                loadTeachers(initialDept, selectedTeacher);
-            }
+            if (initialDept) loadTeachers(initialDept, selectedTeacher);
 
-            // ২. ডিপার্টমেন্ট চেঞ্জ হলে রান করো
             $("#DepartmentId").change(function () {
-                var deptId = $(this).val();
-                loadTeachers(deptId, null);
+                loadTeachers($(this).val(), null);
             });
         });
     </script>

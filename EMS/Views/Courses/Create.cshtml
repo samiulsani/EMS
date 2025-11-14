@@ -1,61 +1,92 @@
 ﻿@model EMS.Models.Course
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Course";
 }
 
-<h1>Create</h1>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-plus-circle me-2"></i> Create New Course</h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small py-2" role="alert"></div>
 
-<h4>Course</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="CourseCode" class="control-label"></label>
-                <input asp-for="CourseCode" class="form-control" />
-                <span asp-validation-for="CourseCode" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Credits" class="control-label"></label>
-                <input asp-for="Credits" class="form-control" />
-                <span asp-validation-for="Credits" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="DepartmentId" class="control-label">Department</label>
-                <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.DepartmentId">
-                    <option value="">-- Select Department --</option>
-                </select>
-                <span asp-validation-for="DepartmentId" class="text-danger"></span>
-            </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CourseCode" class="form-label fw-bold text-muted">Course Code</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-barcode"></i></span>
+                                <input asp-for="CourseCode" class="form-control" placeholder="e.g. CSE-101" />
+                            </div>
+                            <span asp-validation-for="CourseCode" class="text-danger small"></span>
+                        </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="SemesterId" class="control-label">Semester</label>
-                <select asp-for="SemesterId" class="form-control" asp-items="ViewBag.SemesterId">
-                    <option value="">-- Select Semester --</option>
-                </select>
-                <span asp-validation-for="SemesterId" class="text-danger"></span>
-            </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Credits" class="form-label fw-bold text-muted">Credits</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-star"></i></span>
+                                <input asp-for="Credits" class="form-control" placeholder="e.g. 3" />
+                            </div>
+                            <span asp-validation-for="Credits" class="text-danger small"></span>
+                        </div>
+                    </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="TeacherId" class="control-label">Assign Teacher</label>
-                <select asp-for="TeacherId" class="form-control" id="TeacherId" disabled>
-                    <option value="">-- Select Department First --</option>
-                </select>
-                <span asp-validation-for="TeacherId" class="text-danger"></span>
-            </div>
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label fw-bold text-muted">Course Title</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fa-solid fa-book"></i></span>
+                            <input asp-for="Title" class="form-control" placeholder="e.g. Introduction to Programming" />
+                        </div>
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
 
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DepartmentId" class="form-label fw-bold text-muted">Department</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-building-columns"></i></span>
+                                <select asp-for="DepartmentId" class="form-select" asp-items="ViewBag.DepartmentId" id="DepartmentId">
+                                    <option value="">-- Select Department --</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="DepartmentId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="SemesterId" class="form-label fw-bold text-muted">Semester</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-layer-group"></i></span>
+                                <select asp-for="SemesterId" class="form-select" asp-items="ViewBag.SemesterId">
+                                    <option value="">-- Select Semester --</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="SemesterId" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="TeacherId" class="form-label fw-bold text-muted">Assign Teacher </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fa-solid fa-chalkboard-user"></i></span>
+                            <select asp-for="TeacherId" class="form-select" id="TeacherId" disabled>
+                                <option value="">-- Select Department First --</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="TeacherId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary fw-bold py-2">
+                            <i class="fa-solid fa-check me-2"></i> Create Course
+                        </button>
+                        <a asp-action="Index" class="btn btn-light text-muted border">Cancel</a>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -66,31 +97,25 @@
 
     <script>
         $(document).ready(function () {
-            // ডিপার্টমেন্ট পরিবর্তন হলে টিচার লোড হবে
             $("#DepartmentId").change(function () {
                 var deptId = $(this).val();
                 var teacherSelect = $("#TeacherId");
-
-                // ড্রপডাউন খালি করো
-                teacherSelect.empty();
-                teacherSelect.append('<option value="">-- Select Teacher --</option>');
+                teacherSelect.empty().append('<option value="">-- Select Teacher --</option>');
 
                 if (deptId) {
-                    // AJAX কল
                     $.ajax({
                         url: '/Courses/GetTeachersByDepartment',
                         type: 'GET',
                         data: { departmentId: deptId },
                         success: function (data) {
-                            // টিচার লোড করো
                             $.each(data, function (i, teacher) {
                                 teacherSelect.append($('<option></option>').val(teacher.id).html(teacher.name));
                             });
-                            teacherSelect.prop('disabled', false); // ড্রপডাউন সচল করো
+                            teacherSelect.prop('disabled', false);
                         }
                     });
                 } else {
-                    teacherSelect.prop('disabled', true); // ডিপার্টমেন্ট না থাকলে অচল
+                    teacherSelect.prop('disabled', true);
                 }
             });
         });
