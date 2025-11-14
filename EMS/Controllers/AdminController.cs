@@ -240,33 +240,115 @@ namespace EMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id, string source)
         {
+            // ১. নিজের অ্যাকাউন্ট ডিলিট চেক
             if (id == _userManager.GetUserId(User))
             {
+                TempData["ErrorMessage"] = "You cannot delete your own account.";
                 return RedirectToAction(nameof(ListUsers));
             }
 
             var user = await _userManager.FindByIdAsync(id);
             if (user != null)
             {
-                // UserManager ব্যবহার করে ডিলিট করলে এটি অটোমেটিকলি রোল এবং প্রোফাইল ডিলিট করবে (যদি Cascade সেট করা থাকে)
+                // --- ২. রিলেটেড ডেটা ক্লিনআপ (Manual Cleanup) ---
+
+                // ক. যদি স্টুডেন্ট হয়: তার সব একাডেমিক রেকর্ড মুছতে হবে
+                var studentProfile = await _context.StudentProfiles.FindAsync(id);
+                if (studentProfile != null)
+                {
+                    // Exam Results মুছতে হবে
+                    var results = await _context.ExamResults.Where(r => r.StudentId == id).ToListAsync();
+                    _context.ExamResults.RemoveRange(results);
+
+                    // Assignment Submissions মুছতে হবে
+                    var submissions = await _context.AssignmentSubmissions.Where(s => s.StudentId == id).ToListAsync();
+                    _context.AssignmentSubmissions.RemoveRange(submissions);
+
+                    // Attendance Records মুছতে হবে
+                    var attendance = await _context.StudentAttendances.Where(a => a.StudentId == id).ToListAsync();
+                    _context.StudentAttendances.RemoveRange(attendance);
+
+                    // সবশেষে প্রোফাইল মুছতে হবে
+                    _context.StudentProfiles.Remove(studentProfile);
+                }
+
+                // খ. যদি টিচার হয়: তার প্রফেশনাল রেকর্ড ক্লিন করতে হবে
+                var teacherProfile = await _context.TeacherProfiles.FindAsync(id);
+                if (teacherProfile != null)
+                {
+                    // টিচারের কোর্সগুলো থেকে তাকে সরিয়ে দেওয়া (Unassign)
+                    var courses = await _context.Courses.Where(c => c.TeacherId == id).ToListAsync();
+                    foreach (var course in courses)
+                    {
+                        course.TeacherId = null; // কোর্স থাকবে, কিন্তু টিচার থাকবে না
+                    }
+
+                    // টিচারের তৈরি অ্যাসাইনমেন্টগুলো? (থাকলে সমস্যা হতে পারে, তবে আপাতত থাক)
+
+                    // প্রোফাইল মুছতে হবে
+                    _context.TeacherProfiles.Remove(teacherProfile);
+                }
+
+                // ৩. ডাটাবেসে এই পরিবর্তনগুলো সেভ করো
+                await _context.SaveChangesAsync();
+
+                // -----------------------------------------------
+
+                // ৪. এখন নিরাপদে মেইন ইউজার ডিলিট করো
                 var result = await _userManager.DeleteAsync(user);
 
                 if (result.Succeeded)
                 {
-                    TempData["SuccessMessage"] = "User deleted successfully!";
+                    TempData["SuccessMessage"] = "User and all related data deleted successfully!";
+
                     if (source == "Students") return RedirectToAction(nameof(Students));
                     if (source == "Teachers") return RedirectToAction(nameof(Teachers));
                     return RedirectToAction(nameof(ListUsers));
                 }
 
-                // যদি কোনো কারণে ডিলিট না হয়
+                // যদি ডিলিট না হয়
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError("", error.Description);
                 }
             }
+
+            // ইউজার না পাওয়া গেলে বা এরর হলে
             return RedirectToAction(nameof(ListUsers));
         }
+
+        //// POST: Admin/Delete/5
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(string id, string source)
+        //{
+        //    if (id == _userManager.GetUserId(User))
+        //    {
+        //        return RedirectToAction(nameof(ListUsers));
+        //    }
+
+        //    var user = await _userManager.FindByIdAsync(id);
+        //    if (user != null)
+        //    {
+        //        // UserManager ব্যবহার করে ডিলিট করলে এটি অটোমেটিকলি রোল এবং প্রোফাইল ডিলিট করবে (যদি Cascade সেট করা থাকে)
+        //        var result = await _userManager.DeleteAsync(user);
+
+        //        if (result.Succeeded)
+        //        {
+        //            TempData["SuccessMessage"] = "User deleted successfully!";
+        //            if (source == "Students") return RedirectToAction(nameof(Students));
+        //            if (source == "Teachers") return RedirectToAction(nameof(Teachers));
+        //            return RedirectToAction(nameof(ListUsers));
+        //        }
+
+        //        // যদি কোনো কারণে ডিলিট না হয়
+        //        foreach (var error in result.Errors)
+        //        {
+        //            ModelState.AddModelError("", error.Description);
+        //        }
+        //    }
+        //    return RedirectToAction(nameof(ListUsers));
+        //}
 
 
         //User edit option added for user managment.
