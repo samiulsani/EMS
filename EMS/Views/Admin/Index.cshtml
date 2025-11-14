@@ -1,68 +1,129 @@
 ﻿@{
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = "Dashboard";
+
+    // Dynamic Greething logic
+    var currentHour = DateTime.Now.Hour;
+    string greeting;
+
+    if (currentHour >= 5 && currentHour < 12)
+    {
+        greeting = "Good Morning";
+    }
+    else if (currentHour >= 12 && currentHour < 17)
+    {
+        greeting = "Good Afternoon";
+    }
+    else
+    {
+        greeting = "Good Evening";
+    }
+    // ----------------------------------
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="mb-4 pb-2 pt-2 border-bottom d-flex justify-content-between align-items-center">
     <div>
-        <h2 class="text-primary fw-bold"><i class="fa-solid fa-gauge-high"></i> Dashboard Overview</h2>
-        <p class="text-muted">Welcome back, Admin! Here's what's happening today.</p>
+        <h4 class="text-dark fw-bold mb-1">@greeting, Admin! 👋</h4>
+        <p class="text-muted mb-0 small">Here's your daily university overview.</p>
     </div>
-    <div>
-        <span class="badge bg-light text-dark border p-2">
-            <i class="fa-regular fa-calendar"></i> @DateTime.Now.ToString("dd MMMM yyyy")
-        </span>
+    <div class="text-end">
+        <h6 class="mb-0 fw-bold text-primary">@DateTime.Now.ToString("dddd")</h6>
+        <small class="text-muted">@DateTime.Now.ToString("dd MMM yyyy")</small>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 h-100 bg-primary bg-opacity-10">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase small fw-bold">Students</h6>
+                        <h2 class="mb-0 fw-bold text-primary" id="countStudent">...</h2>
+                    </div>
+                    <i class="fa-solid fa-user-graduate fa-2x text-primary opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 h-100 bg-success bg-opacity-10">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase small fw-bold">Teachers</h6>
+                        <h2 class="mb-0 fw-bold text-success" id="countTeacher">...</h2>
+                    </div>
+                    <i class="fa-solid fa-chalkboard-user fa-2x text-success opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 h-100 bg-warning bg-opacity-10">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase small fw-bold">Courses</h6>
+                        <h2 class="mb-0 fw-bold text-warning text-dark" id="countCourse">...</h2>
+                    </div>
+                    <i class="fa-solid fa-book-open fa-2x text-warning opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 h-100 bg-info bg-opacity-10">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase small fw-bold">Present Today</h6>
+                        <h2 class="mb-0 fw-bold text-info text-dark" id="countPresent">...</h2>
+                    </div>
+                    <i class="fa-solid fa-user-check fa-2x text-info opacity-50"></i>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="card shadow-sm border-primary h-100">
-            <div class="card-body d-flex align-items-center justify-content-between">
-                <div>
-                    <h6 class="text-muted fw-bold">Total Students</h6>
-                    <h2 class="mb-0 fw-bold text-primary" id="countStudent">...</h2>
-                </div>
-                <div class="bg-primary text-white rounded-circle p-3">
-                    <i class="fa-solid fa-user-graduate fa-2x"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card shadow-sm border-success h-100">
-            <div class="card-body d-flex align-items-center justify-content-between">
-                <div>
-                    <h6 class="text-muted fw-bold">Total Teachers</h6>
-                    <h2 class="mb-0 fw-bold text-success" id="countTeacher">...</h2>
-                </div>
-                <div class="bg-success text-white rounded-circle p-3">
-                    <i class="fa-solid fa-chalkboard-user fa-2x"></i>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100" style="background-color: rgba(111, 66, 193, 0.1);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase small fw-bold">Total Departments</h6>
+                        <h2 class="mb-0 fw-bold" style="color: #6f42c1;" id="countDept">...</h2>
+                    </div>
+                    <i class="fa-solid fa-building-columns fa-2x opacity-50" style="color: #6f42c1;"></i>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card shadow-sm border-warning h-100">
-            <div class="card-body d-flex align-items-center justify-content-between">
-                <div>
-                    <h6 class="text-muted fw-bold">Active Courses</h6>
-                    <h2 class="mb-0 fw-bold text-warning" id="countCourse">...</h2>
-                </div>
-                <div class="bg-warning text-white rounded-circle p-3">
-                    <i class="fa-solid fa-book-open fa-2x"></i>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100 bg-danger bg-opacity-10">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase small fw-bold">Exams Scheduled</h6>
+                        <h2 class="mb-0 fw-bold text-danger" id="countExam">...</h2>
+                    </div>
+                    <i class="fa-solid fa-file-pen fa-2x text-danger opacity-50"></i>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card shadow-sm border-info h-100">
-            <div class="card-body d-flex align-items-center justify-content-between">
-                <div>
-                    <h6 class="text-muted fw-bold">Total Notices</h6>
-                    <h2 class="mb-0 fw-bold text-info" id="countNotice">...</h2>
-                </div>
-                <div class="bg-info text-white rounded-circle p-3">
-                    <i class="fa-solid fa-bullhorn fa-2x"></i>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100 bg-secondary bg-opacity-10">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase small fw-bold">Notices Published</h6>
+                        <h2 class="mb-0 fw-bold text-secondary text-dark" id="countNotice">...</h2>
+                    </div>
+                    <i class="fa-solid fa-bullhorn fa-2x text-secondary opacity-50"></i>
                 </div>
             </div>
         </div>
@@ -71,23 +132,22 @@
 
 <div class="row g-4">
     <div class="col-md-8">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-white fw-bold">
-                <i class="fa-solid fa-chart-column text-primary"></i> Students per Department
+        <div class="card shadow-sm h-100 border-0">
+            <div class="card-header bg-white py-3 border-0">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-chart-column text-primary me-2"></i> Students per Department</h6>
             </div>
             <div class="card-body">
                 <canvas id="deptChart"></canvas>
             </div>
         </div>
     </div>
-
     <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-white fw-bold">
-                <i class="fa-solid fa-chart-pie text-success"></i> User Ratio
+        <div class="card shadow-sm h-100 border-0">
+            <div class="card-header bg-white py-3 border-0">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-chart-pie text-success me-2"></i> User Ratio</h6>
             </div>
             <div class="card-body d-flex justify-content-center align-items-center">
-                <div style="width: 100%; max-width: 300px;">
+                <div style="width: 100%; max-width: 280px;">
                     <canvas id="userChart"></canvas>
                 </div>
             </div>
@@ -97,21 +157,23 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script>
         $(document).ready(function () {
-            // ডেটা লোড করা
             $.ajax({
                 url: '/Admin/GetDashboardStats',
                 type: 'GET',
                 success: function (data) {
-                    // ক. কার্ড আপডেট
+                    // কার্ড আপডেট
                     $('#countStudent').text(data.totalStudents);
                     $('#countTeacher').text(data.totalTeachers);
                     $('#countCourse').text(data.totalCourses);
+                    $('#countPresent').text(data.presentToday);
+
+                    $('#countDept').text(data.totalDepartments);
+                    $('#countExam').text(data.totalExams);
                     $('#countNotice').text(data.totalNotices);
 
-                    // খ. Bar Chart (Students per Dept)
+                    // Bar Chart
                     var deptLabels = data.studentsByDept.map(x => x.label);
                     var deptValues = data.studentsByDept.map(x => x.value);
 
@@ -120,21 +182,21 @@
                         data: {
                             labels: deptLabels,
                             datasets: [{
-                                label: 'Number of Students',
+                                label: 'Students',
                                 data: deptValues,
                                 backgroundColor: '#0d6efd',
-                                borderRadius: 5
+                                borderRadius: 4,
+                                barPercentage: 0.6
                             }]
                         },
                         options: {
                             responsive: true,
-                            scales: {
-                                y: { beginAtZero: true, ticks: { stepSize: 1 } }
-                            }
+                            plugins: { legend: { display: false } },
+                            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
                         }
                     });
 
-                    // গ. Pie Chart (Student vs Teacher)
+                    // Pie Chart
                     new Chart(document.getElementById('userChart'), {
                         type: 'doughnut',
                         data: {
@@ -147,15 +209,11 @@
                         },
                         options: {
                             responsive: true,
-                            plugins: {
-                                legend: { position: 'bottom' }
-                            }
+                            plugins: { legend: { position: 'bottom' } }
                         }
                     });
                 },
-                error: function (err) {
-                    console.error("Error loading stats", err);
-                }
+                error: function (err) { console.error(err); }
             });
         });
     </script>

@@ -725,26 +725,40 @@ namespace EMS.Controllers
         [HttpGet]
         public async Task<JsonResult> GetDashboardStats()
         {
-            // ১. মোট সংখ্যা বের করা
+            var today = DateTime.Now.Date;
+
+            // কাউন্ট
             var totalStudents = await _context.StudentProfiles.CountAsync();
             var totalTeachers = await _context.TeacherProfiles.CountAsync();
             var totalCourses = await _context.Courses.CountAsync();
             var totalNotices = await _context.Notices.CountAsync();
+            var totalDepartments = await _context.Departments.CountAsync();
+            var totalExams = await _context.Exams.CountAsync();
 
-            // ২. ডিপার্টমেন্ট অনুযায়ী স্টুডেন্ট সংখ্যা (Bar Chart এর জন্য)
+            // আজকের উপস্থিতি (Students Present Today)
+            // আজকের তারিখে কতজন স্টুডেন্ট 'Present' বা 'Late' স্ট্যাটাসে আছে
+            var presentToday = await _context.StudentAttendances
+                .Where(a => a.Date.Date == today && (a.Status == AttendanceStatus.Present || a.Status == AttendanceStatus.Late))
+                .Select(a => a.StudentId)
+                .Distinct() // একজন স্টুডেন্ট একাধিক ক্লাসে প্রেজেন্ট থাকতে পারে
+                .CountAsync();
+
+            // ৪. ডিপার্টমেন্ট চার্ট ডেটা
             var studentsByDept = await _context.StudentProfiles
                 .Include(s => s.Department)
                 .GroupBy(s => s.Department.Name)
                 .Select(g => new { label = g.Key, value = g.Count() })
                 .ToListAsync();
 
-            // ৩. ডেটা রিটার্ন করো
             return Json(new
             {
                 totalStudents,
                 totalTeachers,
                 totalCourses,
                 totalNotices,
+                totalDepartments,
+                totalExams,     
+                presentToday,  
                 studentsByDept
             });
         }
