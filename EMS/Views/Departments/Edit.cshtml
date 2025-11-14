@@ -1,39 +1,52 @@
 ﻿@model EMS.Models.Department
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Department";
 }
 
-<h1>Edit</h1>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-warning text-dark py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i> Edit Department</h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small py-2" role="alert"></div>
+                    <input type="hidden" asp-for="Id" />
 
-<h4>Department</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-bold text-muted">Short Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fa-solid fa-tag"></i></span>
+                            <input asp-for="Name" class="form-control" />
+                        </div>
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="FullName" class="form-label fw-bold text-muted">Full Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fa-solid fa-building"></i></span>
+                            <input asp-for="FullName" class="form-control" />
+                        </div>
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn btn-light text-muted border me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-warning fw-bold px-4">
+                            <i class="fa-solid fa-save me-2"></i> Update
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="FullName" class="control-label"></label>
-                <input asp-for="FullName" class="form-control" />
-                <span asp-validation-for="FullName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
