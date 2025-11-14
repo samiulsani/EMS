@@ -1,91 +1,78 @@
 ﻿@model EMS.Models.ApplicationUser
 
 @{
-    ViewData["Title"] = "User Details";
+    ViewData["Title"] = "Details";
 }
 
-<h1>User Details</h1>
-
-<div class="row">
-    <div class="col-md-6">
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Basic Info</h5>
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-info text-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-circle-info me-2"></i> User Profile</h5>
+                <a href="@(ViewData["Source"]?.ToString() == "Students" ? "/Admin/Students" : ViewData["Source"]?.ToString() == "Teachers" ? "/Admin/Teachers" : "/Admin/ListUsers")" class="btn btn-sm btn-light text-info fw-bold"><i class="fa-solid fa-arrow-left me-1"></i> Back</a>
             </div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Full Name</dt>
-                    <dd class="col-sm-8">@Model.FirstName @Model.LastName</dd>
+            <div class="card-body p-4">
+                <div class="row">
+                    <div class="col-md-4 text-center border-end">
+                        <div class="bg-light rounded-circle d-inline-flex p-4 mb-3 text-secondary border">
+                            <i class="fa-solid fa-user fa-4x"></i>
+                        </div>
+                        <h4 class="fw-bold text-primary">@Model.FirstName @Model.LastName</h4>
+                        <p class="text-muted mb-1">@Model.Email</p>
+                        <p class="text-muted small"><i class="fa-solid fa-phone me-1"></i> @Model.PhoneNumber</p>
 
-                    <dt class="col-sm-4">Email</dt>
-                    <dd class="col-sm-8">@Model.Email</dd>
+                        <div class="mt-3">
+                            @if (Model.StudentProfile != null)
+                            {
+                                <span class="badge bg-success px-3 py-2">Student</span>
+                            }
+                            else if (Model.TeacherProfile != null)
+                            {
 
-                    <dt class="col-sm-4">Phone</dt>
-                    <dd class="col-sm-8">@Model.PhoneNumber</dd>
-                </dl>
+                                <span class="badge bg-info text-dark px-3 py-2">Teacher</span>
+                            }
+                            else
+                            {
+
+                                <span class="badge bg-secondary px-3 py-2">Admin / Staff</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="col-md-8 ps-md-4">
+                        @if (Model.StudentProfile != null)
+                        {
+                            <h6 class="text-success fw-bold mb-3 border-bottom pb-2">Academic Info</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-6"><small class="text-muted d-block">Roll No</small><span class="fw-bold">@Model.StudentProfile.StudentRoll</span></div>
+                                <div class="col-6"><small class="text-muted d-block">Reg No</small><span class="fw-bold">@Model.StudentProfile.RegistrationNo</span></div>
+                                <div class="col-6"><small class="text-muted d-block">Department</small><span class="fw-bold">@Model.StudentProfile.Department?.Name</span></div>
+                                <div class="col-6"><small class="text-muted d-block">Semester</small><span class="fw-bold">@Model.StudentProfile.Semester?.Name</span></div>
+                                <div class="col-6"><small class="text-muted d-block">Session</small><span class="fw-bold">@Model.StudentProfile.Session</span></div>
+                            </div>
+                            <h6 class="text-muted fw-bold mb-3 border-bottom pb-2">Personal Info</h6>
+                            <div class="row g-3">
+                                <div class="col-6"><small class="text-muted d-block">Father Name</small><span class="fw-bold">@Model.StudentProfile.FatherName</span></div>
+                                <div class="col-6"><small class="text-muted d-block">Mother Name</small><span class="fw-bold">@Model.StudentProfile.MotherName</span></div>
+                                <div class="col-12"><small class="text-muted d-block">Address</small><span class="fw-bold">@Model.StudentProfile.Address</span></div>
+                            </div>
+                        }
+                        else if (Model.TeacherProfile != null)
+                        {
+                            <h6 class="text-info fw-bold mb-3 border-bottom pb-2">Professional Info</h6>
+                            <div class="row g-3">
+                                <div class="col-6"><small class="text-muted d-block">Designation</small><span class="fw-bold text-primary">@Model.TeacherProfile.Designation</span></div>
+                                <div class="col-6"><small class="text-muted d-block">Department</small><span class="fw-bold">@Model.TeacherProfile.Department?.Name</span></div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-light text-end p-3">
+                <a asp-action="Edit" asp-route-id="@Model.Id" asp-route-source="@ViewData["Source"]" class="btn btn-warning fw-bold px-4">
+                    <i class="fa-solid fa-pen me-2"></i> Edit
+                </a>
             </div>
         </div>
     </div>
-
-    <div class="col-md-6">
-        @if (Model.StudentProfile != null)
-        {
-            <div class="card mb-4 shadow-sm border-success">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Student Profile</h5>
-                </div>
-                <div class="card-body">
-                    <dl class="row mb-0">
-                        <dt class="col-sm-4">Roll No</dt>
-                        <dd class="col-sm-8">@Model.StudentProfile.StudentRoll</dd>
-
-                        <dt class="col-sm-4">Reg No</dt>
-                        <dd class="col-sm-8">@Model.StudentProfile.RegistrationNo</dd>
-
-                        <dt class="col-sm-4">Department</dt>
-                        <dd class="col-sm-8">@Model.StudentProfile.Department?.Name</dd>
-
-                        <dt class="col-sm-4">Semester</dt>
-                        <dd class="col-sm-8">@Model.StudentProfile.Semester?.Name</dd>
-
-                        <dt class="col-sm-4">Session</dt>
-                        <dd class="col-sm-8">@Model.StudentProfile.Session</dd>
-
-                        <dt class="col-sm-4">Parents</dt>
-                        <dd class="col-sm-8">
-                            F: @Model.StudentProfile.FatherName <br />
-                            M: @Model.StudentProfile.MotherName
-                        </dd>
-                    </dl>
-                </div>
-            </div>
-        }
-        else if (Model.TeacherProfile != null)
-        {
-            <div class="card mb-4 shadow-sm border-info">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Teacher Profile</h5>
-                </div>
-                <div class="card-body">
-                    <dl class="row mb-0">
-                        <dt class="col-sm-4">Designation</dt>
-                        <dd class="col-sm-8">@Model.TeacherProfile.Designation</dd>
-
-                        <dt class="col-sm-4">Department</dt>
-                        <dd class="col-sm-8">@Model.TeacherProfile.Department?.Name</dd>
-                    </dl>
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="alert alert-warning">
-                No specific profile found (Admin or Staff).
-            </div>
-        }
-    </div>
-</div>
-
-<div>
-    <a asp-action="@(ViewData["Source"]?.ToString() ?? "ListUsers")" class="btn btn-secondary">Back to List</a>
 </div>

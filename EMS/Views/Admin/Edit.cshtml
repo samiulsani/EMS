@@ -4,167 +4,105 @@
     ViewData["Title"] = "Edit User";
 }
 
-<h4>Edit User: @Model.FirstName @Model.LastName</h4>
-<hr />
-
-<form asp-action="Edit" method="post" class="row g-3">
-    <input type="hidden" asp-for="Id" />
-    <input type="hidden" asp-for="Role" id="hiddenRole" /> <div class="col-md-6">
-        <div class="card shadow-sm">
-            <div class="card-header">
-                <h5 class="mb-0">Basic Information</h5>
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-warning text-dark py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-user-pen me-2"></i> Edit User</h5>
             </div>
-            <div class="card-body">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="card-body p-4">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small py-2"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="Role" id="hiddenRole" />
+                    <input type="hidden" name="source" value="@ViewData["Source"]" />
 
-                <div class="mb-3">
-                    <label class="form-label">Email (Read-Only)</label>
-                    <input asp-for="Email" class="form-control" readonly />
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Role (Read-Only)</label>
-                    <input asp-for="Role" class="form-control fw-bold" readonly />
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="FirstName" class="form-label"></label>
-                        <input asp-for="FirstName" class="form-control" />
-                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Email" class="form-label fw-bold text-muted small">Email (Read Only)</label>
+                            <input asp-for="Email" class="form-control bg-light" readonly />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-muted small">Role</label>
+                            <input value="@Model.Role" class="form-control bg-light fw-bold text-primary" readonly />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FirstName" class="form-label fw-bold text-muted small">First Name</label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="LastName" class="form-label fw-bold text-muted small">Last Name</label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="PhoneNumber" class="form-label fw-bold text-muted small">Phone Number</label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DepartmentId" class="form-label fw-bold text-muted small">Department</label>
+                            <select asp-for="DepartmentId" asp-items="@Model.DepartmentList" class="form-select"></select>
+                            <span asp-validation-for="DepartmentId" class="text-danger small"></span>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="LastName" class="form-label"></label>
-                        <input asp-for="LastName" class="form-control" />
-                        <span asp-validation-for="LastName" class="text-danger"></span>
+
+                    <div id="teacherSection" style="display: none;" class="bg-light p-3 rounded border mt-3">
+                        <h6 class="text-info fw-bold mb-3">Teacher Information</h6>
+                        <div class="mb-3">
+                            <label asp-for="Designation" class="form-label small fw-bold">Designation</label>
+                            <input asp-for="Designation" class="form-control" />
+                            <span asp-validation-for="Designation" class="text-danger small"></span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="mb-3">
-                    <label asp-for="PhoneNumber" class="form-label"></label>
-                    <input asp-for="PhoneNumber" class="form-control" />
-                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                </div>
+                    <div id="studentSection" style="display: none;" class="bg-light p-3 rounded border mt-3">
+                        <h6 class="text-success fw-bold mb-3">Student Information</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="StudentRoll" class="form-label small fw-bold">Roll No</label>
+                                <input asp-for="StudentRoll" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RegistrationNo" class="form-label small fw-bold">Reg No</label>
+                                <input asp-for="RegistrationNo" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Session" class="form-label small fw-bold">Session</label>
+                                <input asp-for="Session" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="SemesterId" class="form-label small fw-bold">Semester</label>
+                                <select asp-for="SemesterId" asp-items="@Model.SemesterList" class="form-select"></select>
+                            </div>
+                            <div class="col-md-6 mb-3"><label asp-for="DateOfBirth" class="form-label small fw-bold">DOB</label><input asp-for="DateOfBirth" class="form-control" type="date" /></div>
+                            <div class="col-md-6 mb-3"><label asp-for="BloodGroup" class="form-label small fw-bold">Blood Group</label><input asp-for="BloodGroup" class="form-control" /></div>
+                            <div class="col-md-6 mb-3"><label asp-for="FatherName" class="form-label small fw-bold">Father Name</label><input asp-for="FatherName" class="form-control" /></div>
+                            <div class="col-md-6 mb-3"><label asp-for="MotherName" class="form-label small fw-bold">Mother Name</label><input asp-for="MotherName" class="form-control" /></div>
+                            <div class="col-12 mb-3"><label asp-for="Address" class="form-label small fw-bold">Address</label><textarea asp-for="Address" class="form-control" rows="2"></textarea></div>
+                        </div>
+                    </div>
 
-                <div class="mb-3">
-                    <label asp-for="DepartmentId" class="form-label"></label>
-                    <select asp-for="DepartmentId" asp-items="@Model.DepartmentList" class="form-select">
-                        <option value="">-- Select Department --</option>
-                    </select>
-                    <span asp-validation-for="DepartmentId" class="text-danger"></span>
-                </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="@(ViewData["Source"]?.ToString() == "Students" ? "/Admin/Students" : ViewData["Source"]?.ToString() == "Teachers" ? "/Admin/Teachers" : "/Admin/ListUsers")" class="btn btn-light border px-4 me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-warning fw-bold px-4"><i class="fa-solid fa-save me-2"></i> Update</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-
-    <div class="col-md-6">
-
-        <div id="teacherSection" style="display: none;">
-            <div class="card shadow-sm border-info">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Teacher Information</h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label asp-for="Designation" class="form-label"></label>
-                        <input asp-for="Designation" class="form-control" />
-                        <span asp-validation-for="Designation" class="text-danger"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="studentSection" style="display: none;">
-            <div class="card shadow-sm border-success">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Student Information</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="StudentRoll" class="form-label"></label>
-                            <input asp-for="StudentRoll" class="form-control" />
-                            <span asp-validation-for="StudentRoll" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="RegistrationNo" class="form-label"></label>
-                            <input asp-for="RegistrationNo" class="form-control" />
-                            <span asp-validation-for="RegistrationNo" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Session" class="form-label"></label>
-                            <input asp-for="Session" class="form-control" />
-                            <span asp-validation-for="Session" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="SemesterId" class="form-label"></label>
-                            <select asp-for="SemesterId" asp-items="@Model.SemesterList" class="form-select">
-                                <option value="">-- Select Semester --</option>
-                            </select>
-                            <span asp-validation-for="SemesterId" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="DateOfBirth" class="form-label"></label>
-                            <input asp-for="DateOfBirth" class="form-control" />
-                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="BloodGroup" class="form-label"></label>
-                            <input asp-for="BloodGroup" class="form-control" />
-                            <span asp-validation-for="BloodGroup" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="FatherName" class="form-label"></label>
-                        <input asp-for="FatherName" class="form-control" />
-                        <span asp-validation-for="FatherName" class="text-danger"></span>
-                    </div>
-                    <div class="mb-3">
-                        <label asp-for="MotherName" class="form-label"></label>
-                        <input asp-for="MotherName" class="form-control" />
-                        <span asp-validation-for="MotherName" class="text-danger"></span>
-                    </div>
-                    <div class="mb-3">
-                        <label asp-for="Address" class="form-label"></label>
-                        <textarea asp-for="Address" class="form-control" rows="2"></textarea>
-                        <span asp-validation-for="Address" class="text-danger"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <form asp-action="Edit" method="post" class="row g-3">
-        <input type="hidden" asp-for="Id" />
-        <input type="hidden" name="source" value="@ViewData["Source"]" /> <div class="col-12 mt-4">
-            <button type="submit" class="btn btn-warning">Update User</button>
-            <a asp-action="@(ViewData["Source"]?.ToString() ?? "ListUsers")" class="btn btn-secondary">Cancel</a>
-        </div>
-    </form>
-</form>
+</div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
     <script>
         $(document).ready(function () {
-            // পেইজ লোড হওয়ার সাথে সাথে রোল অনুযায়ী সেকশন দেখাও
             var role = $("#hiddenRole").val();
-
-            if (role === "Student") {
-                $("#studentSection").show();
-            } else if (role === "Teacher") {
-                $("#teacherSection").show();
-            }
+            if (role === "Student") $("#studentSection").show();
+            else if (role === "Teacher") $("#teacherSection").show();
         });
     </script>
 }
