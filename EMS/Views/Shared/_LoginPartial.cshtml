@@ -4,21 +4,55 @@
 @inject UserManager<ApplicationUser> UserManager
 
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
+    @if (SignInManager.IsSignedIn(User))
+    {
+        var user = await UserManager.GetUserAsync(User);
+        string dashboardUrl = "#";
+
+        // ড্যাশবোর্ড লিংক লজিক
+        if (User.IsInRole("Admin")) dashboardUrl = Url.Action("Index", "Admin");
+        else if (User.IsInRole("Student")) dashboardUrl = Url.Action("Index", "Student");
+        else if (User.IsInRole("Teacher")) dashboardUrl = Url.Action("Index", "Teacher");
+
+        <li class="nav-item">
+            <a class="nav-link text-dark fw-bold" href="@dashboardUrl">Hello, @user?.FirstName!</a>
+        </li>
+        <li class="nav-item">
+            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button type="submit" class="nav-link btn btn-link text-danger fw-bold border-0" style="text-decoration: none;">Logout</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        @*
     <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
+        <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Register</a>
     </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
+    *@
+
+        <li class="nav-item ms-2">
+            <a class="btn btn-primary btn-modern-login" asp-area="Identity" asp-page="/Account/Login">
+                Log In <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>
+            </a>
+        </li>
+    }
 </ul>
+
+<style>
+    .btn-modern-login {
+        border-radius: 50px; /* পিল শেপ */
+        padding: 8px 25px;
+        font-weight: 600;
+        background: #0d6efd;
+        border: none;
+        box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2); /* ডিফল্ট শ্যাডো */
+        transition: all 0.3s ease;
+    }
+
+        .btn-modern-login:hover {
+            transform: translateY(-2px); /* একটু উপরে উঠবে */
+            box-shadow: 0 8px 15px rgba(13, 110, 253, 0.3); /* হোভার শ্যাডো */
+            background: #0b5ed7;
+        }
+</style>

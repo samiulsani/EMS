@@ -2,7 +2,113 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="bg-white py-5 mb-5">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold text-dark mb-3">Welcome to <span class="text-primary">EMS</span></h1>
+                <p class="lead text-muted mb-4">
+                    Streamline your university experience with our all-in-one Education Management System.
+                    Manage courses, results, attendance, and assignments effortlessly.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="/Identity/Account/Login" class="btn btn-primary btn-lg px-4 shadow-sm fw-bold">
+                        <i class="fa-solid fa-right-to-bracket me-2"></i> Get Started
+                    </a>
+                    <a href="#" class="btn btn-outline-secondary btn-lg px-4 fw-bold">Learn More</a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center mt-5 mt-lg-0">
+                <img src="https://cdn-icons-png.flaticon.com/512/4663/4663114.png" alt="Education" class="img-fluid" style="max-height: 400px;">
+            </div>
+        </div>
+    </div>
 </div>
+
+<div class="container mb-5">
+    <div class="text-center mb-5">
+        <h6 class="text-primary fw-bold text-uppercase">Features</h6>
+        <h2 class="fw-bold">Everything You Need</h2>
+        <p class="text-muted mx-auto" style="max-width: 600px;">
+            Our system provides comprehensive tools for admins, teachers, and students to collaborate efficiently.
+        </p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-3 text-center hover-card">
+                <div class="card-body">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="fa-solid fa-chalkboard-user fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold">Smart Attendance</h5>
+                    <p class="text-muted small">
+                        Teachers can take attendance digitally, and students can track their presence percentage in real-time.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-3 text-center hover-card">
+                <div class="card-body">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="fa-solid fa-square-poll-vertical fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold">Result Processing</h5>
+                    <p class="text-muted small">
+                        Automated grading system. Teachers input marks, and the system calculates GPAs and grades instantly.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-3 text-center hover-card">
+                <div class="card-body">
+                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="fa-solid fa-robot fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold">AI Integration</h5>
+                    <p class="text-muted small">
+                        Advanced AI to check assignment plagiarism and suggest grades to teachers automatically.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-primary py-5 text-white mt-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <h2 class="fw-bold">1000+</h2>
+                <p class="mb-0 text-white-50">Students</p>
+            </div>
+            <div class="col-md-3">
+                <h2 class="fw-bold">50+</h2>
+                <p class="mb-0 text-white-50">Expert Teachers</p>
+            </div>
+            <div class="col-md-3">
+                <h2 class="fw-bold">20+</h2>
+                <p class="mb-0 text-white-50">Departments</p>
+            </div>
+            <div class="col-md-3">
+                <h2 class="fw-bold">5+</h2>
+                <p class="mb-0 text-white-50">Years Experience</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .hover-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+        }
+</style>
