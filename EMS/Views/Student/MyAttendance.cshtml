@@ -4,19 +4,51 @@
     ViewData["Title"] = "My Attendance Report";
 }
 
-<h2 class="mb-4"><i class="fa-solid fa-chart-pie text-info"></i> Attendance Report</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="text-primary fw-bold"><i class="fa-solid fa-chart-pie me-2"></i> Attendance Report</h2>
+        <p class="text-muted mb-0">Track your class attendance and performance.</p>
+    </div>
+</div>
 
-<div class="card shadow-sm">
+@if (Model.Any())
+{
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-start border-4 border-primary h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3 text-primary">
+                        <i class="fa-solid fa-book-open-reader fa-2x"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted text-uppercase small fw-bold mb-1">Total Courses</h6>
+                        <h3 class="mb-0 fw-bold text-dark">@Model.Count()</h3>
+                    </div>
+                    <div class="ms-auto text-end d-none d-md-block">
+                        <span class="text-muted small"><i class="fa-solid fa-circle text-success me-1"></i> Present</span>
+                        <span class="text-muted small ms-3"><i class="fa-solid fa-circle text-danger me-1"></i> Absent</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="card shadow-sm border-0 mb-5">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-bold text-primary"><i class="fa-solid fa-list-ol me-2"></i> Attendance Details</h6>
+    </div>
     <div class="table-responsive">
-        <table class="table table-hover mb-0 align-middle text-center">
+        <table class="table table-hover align-middle mb-0 text-center">
             <thead class="bg-light">
                 <tr>
-                    <th class="text-start">Course</th>
+                    <th class="text-start ps-4">Course</th>
                     <th>Total Classes</th>
                     <th class="text-success">Present</th>
                     <th class="text-warning">Late</th>
                     <th class="text-danger">Absent</th>
                     <th>Percentage</th>
+                    <th class="text-end pe-4">Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,26 +57,35 @@
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td class="text-start">
-                                <span class="fw-bold text-primary">@item.CourseCode</span><br />
-                                <small class="text-muted">@item.CourseTitle</small>
+                            <td class="text-start ps-4">
+                                <div class="fw-bold text-dark">@item.CourseTitle</div>
+                                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">@item.CourseCode</small>
                             </td>
-                            <td><span class="badge bg-secondary">@item.TotalClasses</span></td>
-                            <td>@item.Present</td>
-                            <td>@item.Late</td>
-                            <td>@item.Absent</td>
+                            <td><span class="badge bg-secondary bg-opacity-10 text-dark border">@item.TotalClasses</span></td>
+                            <td class="fw-bold text-success">@item.Present</td>
+                            <td class="fw-bold text-warning text-dark">@item.Late</td>
+                            <td class="fw-bold text-danger">@item.Absent</td>
                             <td>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <div class="progress" style="width: 60px; height: 6px;" role="progressbar">
+                                        <div class="progress-bar @(item.Percentage >= 75 ? "bg-success" : item.Percentage >= 60 ? "bg-warning" : "bg-danger")"
+                                             style="width: @item.Percentage%"></div>
+                                    </div>
+                                    <span class="ms-2 small fw-bold">@item.Percentage%</span>
+                                </div>
+                            </td>
+                            <td class="text-end pe-4">
                                 @if (item.Percentage >= 75)
                                 {
-                                    <span class="badge bg-success">@item.Percentage%</span>
+                                    <span class="badge bg-success">Excellent</span>
                                 }
                                 else if (item.Percentage >= 60)
                                 {
-                                    <span class="badge bg-warning text-dark">@item.Percentage%</span>
+                                    <span class="badge bg-warning text-dark">Average</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-danger">@item.Percentage%</span>
+                                    <span class="badge bg-danger">Poor</span>
                                 }
                             </td>
                         </tr>
@@ -53,7 +94,11 @@
                 else
                 {
                     <tr>
-                        <td colspan="6" class="text-muted py-4">No attendance records found.</td>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <div class="mb-3"><i class="fa-solid fa-chart-bar fa-3x opacity-25"></i></div>
+                            <h5 class="fw-bold">No attendance records found</h5>
+                            <p class="mb-0">Attendance data will appear here once classes start.</p>
+                        </td>
                     </tr>
                 }
             </tbody>
