@@ -110,7 +110,13 @@
             </nav>
         </header>
 
-        <div class="container flex-grow-1 mb-5 pb-5" style="margin-top: 120px;">
+        @{
+            // চেক করা হচ্ছে এটি হোম পেজ কিনা
+            bool isHomePage = ViewContext.RouteData.Values["controller"]?.ToString() == "Home" &&
+            ViewContext.RouteData.Values["action"]?.ToString() == "Index";
+        }
+
+        <div class="@(isHomePage ? "container-fluid p-0" : "container") flex-grow-1 mb-5 pb-5" style="margin-top: @(isHomePage ? "76px" : "120px");">
             @RenderBody()
         </div>
 

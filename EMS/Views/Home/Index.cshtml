@@ -2,76 +2,142 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="bg-white py-5 mb-5">
-    <div class="container py-5">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold text-dark mb-3">Welcome to <span class="text-primary">EMS</span></h1>
-                <p class="lead text-muted mb-4">
-                    Streamline your university experience with our all-in-one Education Management System.
-                    Manage courses, results, attendance, and assignments effortlessly.
-                </p>
-                <div class="d-flex gap-3">
-                    <a href="/Identity/Account/Login" class="btn btn-primary btn-lg px-4 shadow-sm fw-bold">
-                        <i class="fa-solid fa-right-to-bracket me-2"></i> Get Started
+<link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+
+<section class="hero-section d-flex align-items-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-7 col-md-9">
+                <div class="hero-content p-4 p-md-5 text-white">
+                    <h1 class="display-3 fw-bold mb-3 animate-up">Welcome to <span class="text-info">EMS</span></h1>
+                    <p class="lead mb-4 animate-up delay-100">
+                        Streamline your academic journey with our advanced management system.
+                        Experience seamless learning and administration.
+                    </p>
+                    <a href="/Identity/Account/Login" class="btn btn-primary btn-lg px-5 fw-bold rounded-pill shadow-lg animate-up delay-200">
+                        Get Started <i class="fa-solid fa-arrow-right ms-2"></i>
                     </a>
-                    <a href="#" class="btn btn-outline-secondary btn-lg px-4 fw-bold">Learn More</a>
                 </div>
-            </div>
-            <div class="col-lg-6 text-center mt-5 mt-lg-0">
-                <img src="https://cdn-icons-png.flaticon.com/512/4663/4663114.png" alt="Education" class="img-fluid" style="max-height: 400px;">
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<div class="container mb-5">
+<div class="container mt-5 pt-5 mb-5">
     <div class="text-center mb-5">
-        <h6 class="text-primary fw-bold text-uppercase">Features</h6>
-        <h2 class="fw-bold">Everything You Need</h2>
+        <h6 class="text-primary fw-bold text-uppercase">What We Offer</h6>
+        <h2 class="fw-bold">Key Features</h2>
         <p class="text-muted mx-auto" style="max-width: 600px;">
-            Our system provides comprehensive tools for admins, teachers, and students to collaborate efficiently.
+            Explore the powerful tools designed to make educational management seamless.
         </p>
     </div>
 
     <div class="row g-4">
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-4">
             <div class="card h-100 border-0 shadow-sm p-3 text-center hover-card">
                 <div class="card-body">
-                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-4 mb-3">
-                        <i class="fa-solid fa-chalkboard-user fa-2x"></i>
+                    <div class="bg-info bg-opacity-10 text-info rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="fa-solid fa-users-viewfinder fa-2x"></i>
                     </div>
-                    <h5 class="fw-bold">Smart Attendance</h5>
-                    <p class="text-muted small">
-                        Teachers can take attendance digitally, and students can track their presence percentage in real-time.
-                    </p>
+                    <h5 class="fw-bold">Student Management</h5>
+                    <p class="text-muted small">Comprehensive profiles with academic records, contact info, and enrollment history.</p>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm p-3 text-center hover-card">
+                <div class="card-body">
+                    <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="fa-solid fa-book-open fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold">Course Management</h5>
+                    <p class="text-muted small">Assign teachers, manage syllabus, and track course progress effortlessly.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm p-3 text-center hover-card">
+                <div class="card-body">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="fa-solid fa-user-check fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold">Smart Attendance</h5>
+                    <p class="text-muted small">Digital attendance tracking with real-time reports for students and teachers.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
             <div class="card h-100 border-0 shadow-sm p-3 text-center hover-card">
                 <div class="card-body">
                     <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex p-4 mb-3">
                         <i class="fa-solid fa-square-poll-vertical fa-2x"></i>
                     </div>
                     <h5 class="fw-bold">Result Processing</h5>
-                    <p class="text-muted small">
-                        Automated grading system. Teachers input marks, and the system calculates GPAs and grades instantly.
-                    </p>
+                    <p class="text-muted small">Automated grading, GPA calculation, and instant result publication.</p>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm p-3 text-center hover-card">
+                <div class="card-body">
+                    <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="fa-solid fa-chart-line fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold">Performance Analytics</h5>
+                    <p class="text-muted small">Visual charts and graphs to monitor academic growth and attendance trends.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm p-3 text-center hover-card">
+                <div class="card-body">
+                    <div class="bg-dark bg-opacity-10 text-dark rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="fa-solid fa-laptop-code fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold">Dedicated Portals</h5>
+                    <p class="text-muted small">Separate, secure and personalized dashboards for Admin, Teachers, and Students.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm p-3 text-center hover-card">
+                <div class="card-body">
+                    <div class="bg-info bg-opacity-10 text-info rounded-circle d-inline-flex p-4 mb-3" style="color: #6f42c1 !important; background-color: rgba(111, 66, 193, 0.1) !important;">
+                        <i class="fa-solid fa-file-circle-check fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold">Assignment System</h5>
+                    <p class="text-muted small">Create assignments, upload files, and manage submissions with deadline tracking.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm p-3 text-center hover-card">
+                <div class="card-body">
+                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex p-4 mb-3" style="color: #fd7e14 !important; background-color: rgba(253, 126, 20, 0.1) !important;">
+                        <i class="fa-solid fa-bullhorn fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold">Digital Notice Board</h5>
+                    <p class="text-muted small">Real-time announcements and targeted notifications for students and staff.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
             <div class="card h-100 border-0 shadow-sm p-3 text-center hover-card">
                 <div class="card-body">
                     <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex p-4 mb-3">
                         <i class="fa-solid fa-robot fa-2x"></i>
                     </div>
-                    <h5 class="fw-bold">AI Integration</h5>
+                    <h5 class="fw-bold">AI Powered</h5>
                     <p class="text-muted small">
-                        Advanced AI to check assignment plagiarism and suggest grades to teachers automatically.
+                        Smart AI integration for auto-grading suggestions, plagiarism detection, and feedback.
                     </p>
                 </div>
             </div>
@@ -79,36 +145,119 @@
     </div>
 </div>
 
-<div class="bg-primary py-5 text-white mt-5">
-    <div class="container">
-        <div class="row text-center">
-            <div class="col-md-3">
-                <h2 class="fw-bold">1000+</h2>
-                <p class="mb-0 text-white-50">Students</p>
+<section class="py-5 bg-light">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h6 class="text-primary fw-bold text-uppercase ls-1">Our Value</h6>
+                <h2 class="fw-bold display-6 mb-4">Why Choose EMS for Your Institution?</h2>
+                <p class="text-muted lead mb-4" style="font-size: 1.1rem;">
+                    We bridge the gap between traditional education and modern technology, ensuring a seamless experience for everyone.
+                </p>
+
+                <div class="d-flex flex-column gap-3">
+                    <div class="d-flex align-items-start">
+                        <div class="me-3 mt-1 text-success">
+                            <i class="fa-solid fa-circle-check fa-xl"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1">Centralized Management</h5>
+                            <p class="text-muted small mb-0">Manage students, teachers, courses, and exams from a single, intuitive dashboard.</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start">
+                        <div class="me-3 mt-1 text-success">
+                            <i class="fa-solid fa-circle-check fa-xl"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1">Advanced Data Security</h5>
+                            <p class="text-muted small mb-0">Your institutional data is protected with enterprise-grade security and backups.</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start">
+                        <div class="me-3 mt-1 text-success">
+                            <i class="fa-solid fa-circle-check fa-xl"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1">Real-time Notifications</h5>
+                            <p class="text-muted small mb-0">Stay updated with instant alerts for results, notices, and assignment deadlines.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="#" class="btn btn-outline-primary fw-bold px-4 rounded-pill">Discover More</a>
+                </div>
             </div>
-            <div class="col-md-3">
-                <h2 class="fw-bold">50+</h2>
-                <p class="mb-0 text-white-50">Expert Teachers</p>
-            </div>
-            <div class="col-md-3">
-                <h2 class="fw-bold">20+</h2>
-                <p class="mb-0 text-white-50">Departments</p>
-            </div>
-            <div class="col-md-3">
-                <h2 class="fw-bold">5+</h2>
-                <p class="mb-0 text-white-50">Years Experience</p>
+
+            <div class="col-lg-6">
+                <div class="position-relative ps-lg-4">
+                    <img src="https://images.unsplash.com/photo-1531545514256-b1400bc00f31?q=80&w=1974&auto=format&fit=crop"
+                         alt="Why Choose Us" class="img-fluid rounded-4 shadow-lg w-100" style="object-fit: cover; min-height: 400px;">
+
+                    <div class="card border-0 shadow position-absolute bottom-0 start-0 translate-middle-y ms-2 d-none d-md-block" style="width: 220px;">
+                        <div class="card-body p-3 d-flex align-items-center">
+                            <div class="bg-success text-white rounded-circle p-3 me-3">
+                                <i class="fa-solid fa-users fa-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold mb-0 text-success">98%</h4>
+                                <small class="text-muted fw-bold">Satisfaction Rate</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</section>
+
+<div class="bg-white py-5 border-top">
+    <div class="container">
+        <div class="row g-4 justify-content-center text-center">
+
+            <div class="col-md-3 col-6">
+                <div class="p-3">
+                    <div class="mb-3 text-primary">
+                        <i class="fa-solid fa-user-graduate fa-3x"></i>
+                    </div>
+                    <h2 class="fw-bold display-5 text-dark mb-0">1000+</h2>
+                    <p class="text-muted text-uppercase small fw-bold mt-2">Students Enrolled</p>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="p-3">
+                    <div class="mb-3 text-success">
+                        <i class="fa-solid fa-chalkboard-user fa-3x"></i>
+                    </div>
+                    <h2 class="fw-bold display-5 text-dark mb-0">50+</h2>
+                    <p class="text-muted text-uppercase small fw-bold mt-2">Expert Faculty</p>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="p-3">
+                    <div class="mb-3 text-info">
+                        <i class="fa-solid fa-building-columns fa-3x"></i>
+                    </div>
+                    <h2 class="fw-bold display-5 text-dark mb-0">20+</h2>
+                    <p class="text-muted text-uppercase small fw-bold mt-2">Departments</p>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="p-3">
+                    <div class="mb-3 text-warning">
+                        <i class="fa-solid fa-award fa-3x"></i>
+                    </div>
+                    <h2 class="fw-bold display-5 text-dark mb-0">5+</h2>
+                    <p class="text-muted text-uppercase small fw-bold mt-2">Years of Excellence</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
-
-<style>
-    .hover-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-        .hover-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
-        }
-</style>
