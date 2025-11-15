@@ -4,24 +4,26 @@
     ViewData["Title"] = "My Courses";
 }
 
-<h2 class="mb-4"><i class="fa-solid fa-book-open text-success"></i> My Courses</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="text-primary fw-bold"><i class="fa-solid fa-book-open-reader me-2"></i> My Courses</h2>
+        <p class="text-muted mb-0">Your enrolled courses for the current semester.</p>
+    </div>
+</div>
 
-<div class="card shadow-sm">
-    <div class="card-header bg-white py-3">
-        <h5 class="mb-0 text-muted">
-            Total Courses: <span class="badge bg-success">@Model.Count()</span>
-            <span class="float-end fs-6">Total Credits: @Model.Sum(c => c.Credits)</span>
-        </h5>
+<div class="card shadow-sm border-0 mb-5">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-bold text-primary"><i class="fa-solid fa-list me-2"></i> Course List</h6>
+        <span class="badge bg-light text-dark border">Total: @Model.Count()</span>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover mb-0 align-middle">
+        <table class="table table-hover align-middle mb-0">
             <thead class="bg-light">
                 <tr>
-                    <th>Course Code</th>
-                    <th>Title</th>
+                    <th class="ps-4">Course Info</th>
                     <th>Credits</th>
                     <th>Instructor</th>
-                    <th class="text-end">Status</th>
+                    <th class="text-end pe-4">Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -30,14 +32,25 @@
                     @foreach (var course in Model)
                     {
                         <tr>
-                            <td class="fw-bold text-primary">@course.CourseCode</td>
-                            <td>@course.Title</td>
-                            <td>@course.Credits</td>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded p-2 me-3 text-success border text-center" style="width: 45px;">
+                                        <i class="fa-solid fa-book fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="small text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">@course.CourseCode</div>
+                                        <div class="fw-bold text-dark fs-6">@course.Title</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">@course.Credits Cr.</span>
+                            </td>
                             <td>
                                 @if (course.Teacher != null)
                                 {
                                     <div class="d-flex align-items-center">
-                                        <i class="fa-solid fa-chalkboard-user me-2 text-secondary"></i>
+                                        <i class="fa-solid fa-chalkboard-user me-2 text-primary"></i>
                                         <span>@course.Teacher.FirstName @course.Teacher.LastName</span>
                                     </div>
                                 }
@@ -46,8 +59,10 @@
                                     <span class="badge bg-light text-muted border">TBA</span>
                                 }
                             </td>
-                            <td class="text-end">
-                                <span class="badge bg-info">Running</span>
+                            <td class="text-end pe-4">
+                                <span class="badge bg-info bg-opacity-10 text-info border border-info px-3 py-2">
+                                    Running
+                                </span>
                             </td>
                         </tr>
                     }
@@ -55,13 +70,17 @@
                 else
                 {
                     <tr>
-                        <td colspan="5" class="text-center text-muted py-5">
-                            <i class="fa-solid fa-folder-open fa-2x mb-3"></i>
-                            <p class="mb-0">No courses found for your semester.</p>
+                        <td colspan="4" class="text-center py-5 text-muted">
+                            <div class="mb-3"><i class="fa-solid fa-folder-open fa-3x opacity-25"></i></div>
+                            <h5 class="fw-bold">No courses found</h5>
+                            <p class="mb-0">You haven't been enrolled in any courses yet.</p>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
+    </div>
+    <div class="card-footer bg-light py-3 text-end">
+        <span class="small text-muted fw-bold">Total Credits: @Model.Sum(c => c.Credits)</span>
     </div>
 </div>
