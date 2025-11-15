@@ -1,0 +1,77 @@
+﻿@model EMS.Models.ViewModels.ClassSchedule.ClassRoutineViewModel
+
+@{
+    ViewData["Title"] = "Add Class Routine";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-clock me-2"></i> Add New Class Schedule</h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small py-2"></div>
+
+                    <div class="mb-4">
+                        <label asp-for="CourseId" class="form-label fw-bold text-muted">Select Course</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fa-solid fa-book"></i></span>
+                            <select asp-for="CourseId" class="form-select" asp-items="Model.CourseList">
+                                <option value="">-- Choose Course --</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="CourseId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Day" class="form-label fw-bold text-muted">Day of Week</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-calendar-day"></i></span>
+                                <select asp-for="Day" class="form-select" asp-items="Html.GetEnumSelectList<EMS.Models.DayOfWeekEnum>()"></select>
+                            </div>
+                            <span asp-validation-for="Day" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="RoomNo" class="form-label fw-bold text-muted">Room Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-door-open"></i></span>
+                                <input asp-for="RoomNo" class="form-control" placeholder="e.g. 302, Lab-A" />
+                            </div>
+                            <span asp-validation-for="RoomNo" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="StartTime" class="form-label fw-bold text-muted">Start Time</label>
+                            <input asp-for="StartTime" class="form-control" type="time" />
+                            <span asp-validation-for="StartTime" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="EndTime" class="form-label fw-bold text-muted">End Time</label>
+                            <input asp-for="EndTime" class="form-control" type="time" />
+                            <span asp-validation-for="EndTime" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn btn-light border px-4 me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary fw-bold px-4">
+                            <i class="fa-solid fa-check me-2"></i> Add Routine
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
