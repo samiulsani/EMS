@@ -4,30 +4,69 @@
     ViewData["Title"] = "Notice Board";
 }
 
-<h2 class="mb-4"><i class="fa-solid fa-bullhorn text-warning"></i> Notice Board</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="text-primary fw-bold"><i class="fa-solid fa-bullhorn me-2"></i> Notice Board</h2>
+        <p class="text-muted mb-0">Stay updated with the latest announcements.</p>
+    </div>
+</div>
 
-<div class="row">
-    @foreach (var item in Model)
-    {
-        <div class="col-md-12 mb-3">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <h5 class="card-title text-primary">@item.Title</h5>
-                        <small class="text-muted">@item.PostedDate.ToString("dd MMM yyyy")</small>
+@if (!Model.Any())
+{
+    <div class="text-center py-5 text-muted bg-light rounded border border-dashed">
+        <i class="fa-regular fa-folder-open fa-3x mb-3 opacity-25"></i>
+        <h5>No notices available.</h5>
+        <p>Check back later for updates.</p>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 notice-card hover-shadow transition-300">
+                    <div class="card-header bg-white border-0 pt-3 pb-0">
+                        <span class="badge bg-light text-secondary border">
+                            <i class="fa-regular fa-calendar me-1"></i> @item.PostedDate.ToString("dd MMM yyyy")
+                        </span>
                     </div>
-                    <p class="card-text text-muted">
-                        @(item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)
-                    </p>
-                    <a asp-action="NoticeDetails" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
-                        Read More <i class="fa-solid fa-arrow-right"></i>
-                    </a>
+
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-dark mb-2">
+                            <a asp-action="NoticeDetails" asp-route-id="@item.Id" class="text-decoration-none text-dark stretched-link">
+                                @item.Title
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted small text-truncate-3">
+                            @(item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)
+                        </p>
+                    </div>
+
+                    <div class="card-footer bg-white border-0 pb-3 pt-0">
+                        <small class="text-primary fw-bold">Read More <i class="fa-solid fa-arrow-right ms-1"></i></small>
+                    </div>
                 </div>
             </div>
-        </div>
+        }
+    </div>
+}
+
+<style>
+    /* কার্ড হোভার এফেক্ট */
+    .hover-shadow:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
     }
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info">No notices available at the moment.</div>
+
+    .transition-300 {
+        transition: all 0.3s ease;
     }
-</div>
+
+    .text-truncate-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>

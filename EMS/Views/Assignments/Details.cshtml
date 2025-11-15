@@ -5,37 +5,51 @@
     Layout = "_DashboardLayout";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="text-primary"><i class="fa-solid fa-circle-info"></i> Assignment Details</h3>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-</div>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-info text-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-circle-info me-2"></i> Assignment Details</h5>
+                <a asp-action="Index" class="btn btn-sm btn-light text-info fw-bold"><i class="fa-solid fa-arrow-left me-1"></i> Back</a>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-4 border-bottom pb-3">
+                    <h3 class="text-primary fw-bold mb-1">@Model.Title</h3>
+                    <span class="badge bg-secondary">@Model.Course?.CourseCode</span>
+                    <span class="text-muted ms-2">@Model.Course?.Title</span>
+                </div>
 
-<div class="card shadow-sm">
-    <div class="card-header bg-light">
-        <h4 class="mb-0">@Model.Title</h4>
-    </div>
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Course:</dt>
-            <dd class="col-sm-9">@Model.Course?.Title (@Model.Course?.CourseCode)</dd>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded border text-center h-100">
+                            <small class="text-muted fw-bold text-uppercase d-block mb-1">Deadline</small>
+                            <div class="text-danger fw-bold">@Model.Deadline.ToString("dd MMM, h:mm tt")</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded border text-center h-100">
+                            <small class="text-muted fw-bold text-uppercase d-block mb-1">Total Marks</small>
+                            <div class="h4 fw-bold text-dark mb-0">@Model.TotalMarks</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded border text-center h-100">
+                            <small class="text-muted fw-bold text-uppercase d-block mb-1">Created On</small>
+                            <div class="text-muted">@Model.CreatedDate.ToString("dd MMM yyyy")</div>
+                        </div>
+                    </div>
+                </div>
 
-            <dt class="col-sm-3">Deadline:</dt>
-            <dd class="col-sm-9 text-danger fw-bold">@Model.Deadline.ToString("dd MMMM yyyy, h:mm tt")</dd>
+                <div class="mb-4">
+                    <h6 class="fw-bold text-dark border-bottom pb-2">Instructions:</h6>
+                    <div class="p-3 bg-light border rounded text-secondary" style="white-space: pre-wrap; line-height: 1.6;">@Model.Description</div>
+                </div>
 
-            <dt class="col-sm-3">Total Marks:</dt>
-            <dd class="col-sm-9">@Model.TotalMarks</dd>
-
-            <dt class="col-sm-3">Created:</dt>
-            <dd class="col-sm-9 text-muted">@Model.CreatedDate.ToString("dd MMM yyyy")</dd>
-
-            <dt class="col-sm-12 mt-3">Instructions:</dt>
-            <dd class="col-sm-12 border p-3 bg-white rounded">
-                @Html.Raw(Model.Description.Replace("\n", "<br>"))
-            </dd>
-        </dl>
-    </div>
-    <div class="card-footer">
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
-        <a asp-action="Submissions" asp-route-id="@Model.Id" class="btn btn-info text-white">View Submissions</a>
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning fw-bold px-4"><i class="fa-solid fa-pen me-2"></i> Edit</a>
+                    <a asp-action="Submissions" asp-route-id="@Model.Id" class="btn btn-info text-white fw-bold px-4"><i class="fa-solid fa-folder-open me-2"></i> Submissions</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
