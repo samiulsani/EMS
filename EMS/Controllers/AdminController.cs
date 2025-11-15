@@ -490,7 +490,8 @@ namespace EMS.Controllers
         }
 
 
-        public async Task<IActionResult> ListUsers()
+        // GET: Admin/ListUsers
+        public async Task<IActionResult> ListUsers(string roleFilter)
         {
             var users = await _userManager.Users.ToListAsync();
             var userListModel = new List<UserListViewModel>();
@@ -498,13 +499,25 @@ namespace EMS.Controllers
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
+
+                // যদি রোল ফিল্টার থাকে এবং ইউজারের রোলের সাথে না মিলে, তবে বাদ দাও
+                if (!string.IsNullOrEmpty(roleFilter) && !roles.Contains(roleFilter))
+                {
+                    continue;
+                }
+
                 userListModel.Add(new UserListViewModel
                 {
                     UserId = user.Id,
+                    FullName = $"{user.FirstName} {user.LastName}",
                     Email = user.Email,
+                    PhoneNumber = user.PhoneNumber ?? "N/A",
                     Roles = string.Join(", ", roles)
                 });
             }
+
+            // ড্রপডাউনের জন্য রোল লিস্ট
+            ViewBag.RoleList = new SelectList(new List<string> { "Admin", "Teacher", "Student" }, roleFilter);
 
             return View(userListModel);
         }

@@ -3,54 +3,122 @@
 @inject UserManager<ApplicationUser> UserManager
 
 @{
-    ViewData["Title"] = "All Users";
+    ViewData["Title"] = "Manage Users";
 }
 
-<h1>All Users</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="text-primary fw-bold"><i class="fa-solid fa-users-gear me-2"></i> Manage Users</h2>
+        <p class="text-muted mb-0">Administer all system accounts.</p>
+    </div>
+    <a asp-action="CreateUser" asp-route-source="ListUsers" class="btn btn-primary fw-bold px-4 shadow-sm">
+        <i class="fa-solid fa-user-plus me-2"></i> Create New User
+    </a>
+</div>
 
-<p>
-    <a asp-action="CreateUser" class="btn btn-primary">Create New User</a>
-</p>
+<div class="card shadow-sm border-0 mb-4 bg-light">
+    <div class="card-body py-3">
+        <form asp-action="ListUsers" method="get" class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label class="col-form-label fw-bold text-muted">Filter by Role:</label>
+            </div>
+            <div class="col-md-4">
+                <select name="roleFilter" class="form-select" asp-items="ViewBag.RoleList" onchange="this.form.submit()">
+                    <option value="">-- Show All Users --</option>
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
 
-<div class="card shadow-sm">
-    <div class="card-body p-0">
-        <table class="table table-striped mb-0">
+<div class="card shadow-sm border-0 mb-5">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-bold text-primary"><i class="fa-solid fa-list me-2"></i> All Accounts</h6>
+        <span class="badge bg-light text-dark border">Total: @Model.Count()</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
             <thead class="bg-light">
                 <tr>
-                    <th>Email</th>
-                    <th>Roles</th>
-                    <th class="text-end">Actions</th>
+                    <th class="ps-4">User Info</th>
+                    <th>Role</th>
+                    <th>Contact</th>
+                    <th class="text-end pe-4">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var user in Model)
+                @if (Model.Any())
                 {
-                    <tr>
-                        <td>@user.Email</td>
-                        <td>
-                            <span class="badge bg-info text-dark">@user.Roles</span>
-                        </td>
-                        <td class="text-end">
-                            <div class="btn-group" role="group">
-                                <a asp-action="Details" asp-route-id="@user.UserId" asp-route-source="ListUsers" class="btn btn-outline-primary btn-sm">
-                                    <i class="fa-solid fa-circle-info"></i> Details
-                                </a>
-                                <a asp-action="Edit" asp-route-id="@user.UserId" asp-route-source="ListUsers" class="btn btn-outline-warning btn-sm">
-                                    <i class="fa-solid fa-pen-to-square"></i> Edit
-                                </a>
-                                @if (user.UserId != UserManager.GetUserId(User))
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded-circle d-flex justify-content-center align-items-center me-3 text-secondary border" style="width: 40px; height: 40px;">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark">@user.FullName</div>
+                                        <div class="small text-muted">@user.Email</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                @if (user.Roles.Contains("Admin"))
+                                {
+                                    <span class="badge bg-danger">Admin</span>
+                                }
+                                else if (user.Roles.Contains("Teacher"))
+                                {
+
+                                    <span class="badge bg-info text-dark">Teacher</span>
+                                }
+                                else if (user.Roles.Contains("Student"))
+                                {
+
+                                    <span class="badge bg-success">Student</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge bg-secondary">User</span>
+                                }
+                            </td>
+                            <td class="small text-muted">
+                                <i class="fa-solid fa-phone me-1"></i> @user.PhoneNumber
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group">
+                                    <a asp-action="Details" asp-route-id="@user.UserId" asp-route-source="ListUsers" class="btn btn-sm btn-outline-primary" title="Details">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@user.UserId" asp-route-source="ListUsers" class="btn btn-sm btn-outline-warning" title="Edit">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+
+                                    @if (user.UserId != UserManager.GetUserId(User))
                                     {
-                                    <a asp-action="Delete" asp-route-id="@user.UserId" asp-route-source="ListUsers" class="btn btn-outline-danger btn-sm">
-                                            <i class="fa-solid fa-trash"></i> Delete
+                                        <a asp-action="Delete" asp-route-id="@user.UserId" asp-route-source="ListUsers" class="btn btn-sm btn-outline-danger" title="Delete">
+                                            <i class="fa-solid fa-trash"></i>
                                         </a>
                                     }
                                     else
                                     {
-                                        <button class="btn btn-outline-secondary btn-sm" disabled>
-                                            <i class="fa-solid fa-user-shield"></i> You
+                                        <button class="btn btn-sm btn-secondary" disabled title="You cannot delete yourself">
+                                            <i class="fa-solid fa-user-shield"></i>
                                         </button>
                                     }
-                            </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-users-slash fa-3x mb-3 opacity-25"></i>
+                            <p class="mb-0 fw-bold">No users found for this role.</p>
                         </td>
                     </tr>
                 }
