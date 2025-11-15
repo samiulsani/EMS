@@ -249,6 +249,14 @@
                                     <i class="fa-solid fa-check-double me-2"></i> Attendance
                                 </a>
                             </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "Teacher" && currentAction == "MyClassSchedule" ? "active" : "")"
+                                   asp-controller="Teacher" asp-action="MyClassSchedule">
+                                    <i class="fa-solid fa-calendar-day me-2"></i> My Schedule
+                                </a>
+                            </li>
+
                             <li class="nav-item">
                                 <a class="nav-link @(currentController == "Teacher" && (currentAction == "ManageExams" || currentAction == "CreateExam" || currentAction == "InputMarks") ? "active" : "")"
                                    asp-controller="Teacher" asp-action="ManageExams">

@@ -1,0 +1,65 @@
+﻿@model IEnumerable<EMS.Models.ClassRoutine>
+
+@{
+    ViewData["Title"] = "My Class Schedule";
+    // দিন অনুযায়ী রুটিন গ্রুপিং করা
+    var groupedRoutine = Model.GroupBy(r => r.Day).OrderBy(g => g.Key);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="text-primary fw-bold"><i class="fa-solid fa-calendar-week me-2"></i> My Class Schedule</h2>
+        <p class="text-muted mb-0">Your weekly teaching routine.</p>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5 text-muted bg-light rounded border border-dashed">
+        <i class="fa-regular fa-calendar-xmark fa-3x mb-3 opacity-25"></i>
+        <h5>No class schedule found.</h5>
+        <p class="mb-0">You haven't been assigned any class routines yet.</p>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var dayGroup in groupedRoutine)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-header bg-info text-white py-3">
+                        <h5 class="mb-0 fw-bold text-center">@dayGroup.Key</h5>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            @foreach (var routine in dayGroup)
+                            {
+                                <div class="list-group-item p-3 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="badge bg-light text-primary border fw-bold">
+                                            <i class="fa-regular fa-clock me-1"></i>
+                                            @DateTime.Today.Add(routine.StartTime).ToString("hh:mm tt") -
+                                            @DateTime.Today.Add(routine.EndTime).ToString("hh:mm tt")
+                                        </span>
+                                        <span class="badge bg-warning text-dark shadow-sm">Room: @routine.RoomNo</span>
+                                    </div>
+
+                                    <h6 class="fw-bold text-dark mb-1">@routine.Course?.Title</h6>
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="small text-muted">Code: <span class="fw-bold text-primary">@routine.Course?.CourseCode</span></div>
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary" style="font-size: 0.7rem;">
+                                            @routine.Course?.Semester?.Name
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

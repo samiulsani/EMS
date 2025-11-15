@@ -497,5 +497,24 @@ namespace EMS.Controllers
             TempData["SuccessMessage"] = "Marks updated successfully!";
             return RedirectToAction(nameof(ManageExams));
         }
+
+        // GET: Teacher/MyClassSchedule
+        public async Task<IActionResult> MyClassSchedule()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // টিচারের নিজস্ব ক্লাস রুটিন খুঁজে বের করা
+            var routines = await _context.ClassRoutines
+                .Include(r => r.Course)
+                    .ThenInclude(c => c.Department)
+                .Include(r => r.Course)
+                    .ThenInclude(c => c.Semester)
+                .Where(r => r.Course.TeacherId == userId) // লজিক: শুধু এই টিচারের ক্লাস
+                .OrderBy(r => r.Day)        // বার অনুযায়ী
+                .ThenBy(r => r.StartTime)   // সময় অনুযায়ী
+                .ToListAsync();
+
+            return View(routines);
+        }
     }
 }
