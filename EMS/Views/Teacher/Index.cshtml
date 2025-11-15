@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "Dashboard";
 
-    // ডাইনামিক গ্রিটিংস লজিক
     var currentHour = DateTime.Now.Hour;
     string greeting;
     if (currentHour >= 5 && currentHour < 12) { greeting = "Good Morning"; }
@@ -75,10 +74,10 @@
     </div>
 </div>
 
-<div class="row g-4">
+<div class="row g-4 mb-5">
     <div class="col-lg-8">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-0">
+        <div class="card shadow-sm border h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
                 <h6 class="mb-0 fw-bold text-primary"><i class="fa-solid fa-chalkboard me-2"></i> My Courses</h6>
                 <a asp-action="MyCourses" class="btn btn-sm btn-outline-primary">View All</a>
             </div>
@@ -127,10 +126,10 @@
 
     <div class="col-lg-4">
 
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
-                <h6 class="mb-0 fw-bold text-warning text-dark"><i class="fa-solid fa-bullhorn me-2"></i> Recent Notices</h6>
-                <a asp-action="Notices" class="btn btn-sm btn-light text-muted"><i class="fa-solid fa-arrow-right"></i></a>
+        <div class="card shadow-sm border mb-4">
+            <div class="card-header bg-light py-3 border-bottom d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-bullhorn text-warning me-2"></i> Recent Notices</h6>
+                <a asp-action="Notices" class="btn btn-sm btn-white border bg-white text-muted shadow-sm"><i class="fa-solid fa-arrow-right"></i></a>
             </div>
             <div class="card-body p-0">
                 @if (Model.Notices.Any())
@@ -138,11 +137,11 @@
                     <div class="list-group list-group-flush">
                         @foreach (var notice in Model.Notices)
                         {
-                            <a asp-action="NoticeDetails" asp-route-id="@notice.Id" class="list-group-item list-group-item-action border-0 px-4 py-3">
+                            <a asp-action="NoticeDetails" asp-route-id="@notice.Id" class="list-group-item list-group-item-action border-0 px-4 py-3 border-bottom">
                                 <div class="d-flex w-100 justify-content-between align-items-center mb-1">
-                                    <small class="text-muted"><i class="fa-regular fa-clock me-1"></i> @notice.PostedDate.ToString("dd MMM")</small>
+                                    <small class="text-muted" style="font-size: 0.75rem;"><i class="fa-regular fa-clock me-1"></i> @notice.PostedDate.ToString("dd MMM")</small>
                                 </div>
-                                <h6 class="mb-1 text-dark fw-bold text-truncate">@notice.Title</h6>
+                                <h6 class="mb-0 text-dark fw-bold text-truncate" style="font-size: 0.9rem;">@notice.Title</h6>
                             </a>
                         }
                     </div>
@@ -166,6 +165,7 @@
                 <div class="mb-3">
                     <span class="badge bg-white text-primary fw-bold px-3">@Model.Designation</span>
                 </div>
+
                 <p class="mb-1 opacity-75 small">@Model.Email</p>
                 <p class="mb-0 small"><i class="fa-solid fa-phone me-1"></i> @Model.Phone</p>
             </div>
