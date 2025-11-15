@@ -1,125 +1,112 @@
 ﻿@model EMS.Models.ViewModels.Teacher.TeacherDashboardViewModel
 
 @{
-    ViewData["Title"] = "Teacher Dashboard";
+    ViewData["Title"] = "Dashboard";
+
+    // ডাইনামিক গ্রিটিংস লজিক
+    var currentHour = DateTime.Now.Hour;
+    string greeting;
+    if (currentHour >= 5 && currentHour < 12) { greeting = "Good Morning"; }
+    else if (currentHour >= 12 && currentHour < 17) { greeting = "Good Afternoon"; }
+    else { greeting = "Good Evening"; }
 }
 
-<h1 class="h3 mb-4">Welcome, @Model.Name! 👨‍🏫</h1>
+<div class="mb-4 pb-2 border-bottom d-flex justify-content-between align-items-center">
+    <div>
+        <h4 class="text-dark fw-bold mb-1">@greeting, @Model.Name! 👨‍🏫</h4>
+        <p class="text-muted mb-0 small">Here's your teaching overview for today.</p>
+    </div>
+    <div class="text-end">
+        <h6 class="mb-0 fw-bold text-primary">@DateTime.Now.ToString("dddd")</h6>
+        <small class="text-muted">@DateTime.Now.ToString("dd MMM yyyy")</small>
+    </div>
+</div>
 
-<div class="row">
-    <div class="col-md-5">
-        <div class="card shadow-sm border-info">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="fa-solid fa-user-tie me-2"></i> My Profile</h5>
-            </div>
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100 bg-primary bg-opacity-10">
             <div class="card-body">
-                <div class="text-center mb-3">
-                    <i class="fa-solid fa-chalkboard-user fa-4x text-secondary"></i>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase small fw-bold">Assigned Courses</h6>
+                        <h2 class="mb-0 fw-bold text-primary">@Model.TotalAssignedCourses</h2>
+                    </div>
+                    <div class="bg-white rounded-circle p-3 text-primary shadow-sm">
+                        <i class="fa-solid fa-book-open fa-2x"></i>
+                    </div>
                 </div>
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Designation</dt>
-                    <dd class="col-sm-8 fw-bold text-primary">@Model.Designation</dd>
-
-                    <dt class="col-sm-4">Department</dt>
-                    <dd class="col-sm-8">@Model.Department</dd>
-
-                    <dt class="col-sm-4">Email</dt>
-                    <dd class="col-sm-8 text-break">@Model.Email</dd>
-
-                    <dt class="col-sm-4">Phone</dt>
-                    <dd class="col-sm-8">@Model.Phone</dd>
-                </dl>
             </div>
         </div>
     </div>
 
-    <div class="col-md-7">
-        <div class="row g-3 mb-4">
-
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0"><i class="fa-solid fa-bullhorn me-2"></i> Notice Board</h5>
-                </div>
-                <div class="card-body p-0">
-                    @if (Model.Notices.Any())
-                    {
-                        <div class="list-group list-group-flush">
-                            @foreach (var notice in Model.Notices)
-                            {
-                                <a asp-action="NoticeDetails" asp-route-id="@notice.Id" class="list-group-item list-group-item-action flex-column align-items-start">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1 text-primary fw-bold">@notice.Title</h6>
-                                        <small class="text-muted">@notice.PostedDate.ToString("dd MMM")</small>
-                                    </div>
-                                    <p class="mb-1 small text-secondary">
-                                        @(notice.Description.Length > 80 ? notice.Description.Substring(0, 80) + "..." : notice.Description)
-                                    </p>
-                                    <small class="text-info">Click for details</small>
-                                </a>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="p-4 text-center text-muted">
-                            <p class="mb-0">No notices at the moment.</p>
-                        </div>
-                    }
-                </div>
-                <div class="card-footer text-center bg-white">
-                    <a asp-action="Notices" class="btn btn-sm btn-outline-secondary">View All Notices</a>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="card text-center shadow-sm h-100 border-primary">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary"><i class="fa-solid fa-book-open"></i> Assigned Courses</h5>
-                        <p class="display-4 fw-bold my-2">@Model.TotalAssignedCourses</p>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100 bg-info bg-opacity-10">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase small fw-bold">Department</h6>
+                        <h5 class="mb-0 fw-bold text-info text-dark">@Model.Department</h5>
+                        <small class="text-muted">@Model.Designation</small>
                     </div>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="card text-center shadow-sm h-100 border-success">
-                    <div class="card-body">
-                        <h5 class="card-title text-success"><i class="fa-solid fa-check-double"></i> Attendance</h5>
-                        <p class="card-text mt-3">Take attendance for today's classes.</p>
-                        <a href="#" class="btn btn-sm btn-outline-success">Take Attendance (Soon)</a>
+                    <div class="bg-white rounded-circle p-3 text-info shadow-sm">
+                        <i class="fa-solid fa-building-columns fa-2x"></i>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="card shadow-sm">
-            <div class="card-header bg-white">
-                <h5 class="mb-0">My Course List</h5>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100 bg-success bg-opacity-10">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase small fw-bold">Quick Action</h6>
+                        <a asp-action="Attendance" class="btn btn-sm btn-success fw-bold shadow-sm mt-1">
+                            <i class="fa-solid fa-check-double me-1"></i> Take Attendance
+                        </a>
+                    </div>
+                    <div class="bg-white rounded-circle p-3 text-success shadow-sm">
+                        <i class="fa-solid fa-user-check fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-0">
+                <h6 class="mb-0 fw-bold text-primary"><i class="fa-solid fa-chalkboard me-2"></i> My Courses</h6>
+                <a asp-action="MyCourses" class="btn btn-sm btn-outline-primary">View All</a>
             </div>
             <div class="table-responsive">
-                <table class="table table-hover mb-0 align-middle">
+                <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light">
                         <tr>
-                            <th>Course Code</th>
-                            <th>Title</th>
+                            <th class="ps-4">Course Info</th>
                             <th>Semester</th>
-                            <th>Credits</th>
-                            <th>Action</th>
+                            <th class="text-end pe-4">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (Model.AssignedCourses.Any())
                         {
-                            @foreach (var course in Model.AssignedCourses)
+                            @foreach (var course in Model.AssignedCourses.Take(5)) // প্রথম ৫টি দেখাবে
                             {
                                 <tr>
-                                    <td class="fw-bold text-primary">@course.CourseCode</td>
-                                    <td>@course.Title</td>
-                                    <td><span class="badge bg-info text-dark">@course.Semester?.Name</span></td>
-                                    <td>@course.Credits</td>
-                                    <td>
-                                        <a href="#" class="btn btn-sm btn-outline-primary" title="View Details">
-                                            <i class="fa-solid fa-arrow-right"></i>
-                                        </a>
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-dark">@course.Title</div>
+                                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">@course.CourseCode</small>
+                                    </td>
+                                    <td><span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary">@course.Semester?.Name</span></td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group btn-group-sm">
+                                            <a asp-action="EnrolledStudents" asp-route-courseId="@course.Id" class="btn btn-outline-info" title="Students"><i class="fa-solid fa-users"></i></a>
+                                            <a asp-action="TakeAttendance" asp-route-courseId="@course.Id" class="btn btn-outline-success" title="Attendance"><i class="fa-solid fa-check"></i></a>
+                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -127,8 +114,9 @@
                         else
                         {
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-4">
-                                    <i class="fa-solid fa-circle-exclamation me-2"></i> You have not been assigned any courses yet.
+                                <td colspan="3" class="text-center py-4 text-muted">
+                                    <i class="fa-solid fa-box-open fa-2x mb-2 opacity-50"></i>
+                                    <p class="mb-0">No courses assigned yet.</p>
                                 </td>
                             </tr>
                         }
@@ -137,5 +125,48 @@
             </div>
         </div>
     </div>
-</div>
+
+    <div class="col-lg-4">
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold text-warning text-dark"><i class="fa-solid fa-bullhorn me-2"></i> Recent Notices</h6>
+                <a asp-action="Notices" class="btn btn-sm btn-light text-muted"><i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.Notices.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var notice in Model.Notices)
+                        {
+                            <a asp-action="NoticeDetails" asp-route-id="@notice.Id" class="list-group-item list-group-item-action border-0 px-4 py-3">
+                                <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                                    <small class="text-muted"><i class="fa-regular fa-clock me-1"></i> @notice.PostedDate.ToString("dd MMM")</small>
+                                </div>
+                                <h6 class="mb-1 text-dark fw-bold text-truncate">@notice.Title</h6>
+                            </a>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="p-4 text-center text-muted">
+                        <p class="mb-0 small">No new notices.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 bg-primary text-white">
+            <div class="card-body p-4 text-center">
+                <div class="bg-white text-primary rounded-circle d-inline-flex p-3 mb-3 shadow-sm">
+                    <i class="fa-solid fa-user-tie fa-2x"></i>
+                </div>
+                <h5 class="fw-bold mb-0">@Model.Name</h5>
+                <p class="mb-2 opacity-75 small">@Model.Email</p>
+                <p class="mb-0 small"><i class="fa-solid fa-phone me-1"></i> @Model.Phone</p>
+            </div>
+        </div>
+
+    </div>
 </div>
