@@ -1,0 +1,70 @@
+﻿@model IEnumerable<EMS.Models.ClassRoutine>
+
+@{
+    ViewData["Title"] = "My Class Routine";
+    // বার অনুযায়ী গ্রুপিং করা
+    var groupedRoutine = Model.GroupBy(r => r.Day).OrderBy(g => g.Key);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="text-primary fw-bold"><i class="fa-solid fa-calendar-week me-2"></i> Class Routine</h2>
+        <p class="text-muted mb-0">Your weekly class schedule.</p>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5 text-muted bg-light rounded border border-dashed">
+        <i class="fa-regular fa-calendar-xmark fa-3x mb-3 opacity-25"></i>
+        <h5>No routine found for your semester.</h5>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var dayGroup in groupedRoutine)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="mb-0 fw-bold text-center">@dayGroup.Key</h5>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            @foreach (var routine in dayGroup)
+                            {
+                                <div class="list-group-item p-3 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="badge bg-light text-primary border fw-bold">
+                                            <i class="fa-regular fa-clock me-1"></i>
+                                            @DateTime.Today.Add(routine.StartTime).ToString("hh:mm tt") -
+                                            @DateTime.Today.Add(routine.EndTime).ToString("hh:mm tt")
+                                        </span>
+                                        <span class="badge bg-warning text-dark">Room: @routine.RoomNo</span>
+                                    </div>
+
+                                    <h6 class="fw-bold text-dark mb-1">@routine.Course?.Title</h6>
+                                    <div class="small text-muted mb-1">Code: <span class="fw-bold">@routine.Course?.CourseCode</span></div>
+
+                                    @if (routine.Course?.Teacher != null)
+                                    {
+                                        <div class="small text-success">
+                                            <i class="fa-solid fa-chalkboard-user me-1"></i>
+                                            @routine.Course.Teacher.FirstName @routine.Course.Teacher.LastName
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="small text-muted fst-italic">TBA</div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

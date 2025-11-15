@@ -413,5 +413,30 @@ namespace EMS.Controllers
                 };
             }
         }
+
+        // GET: Student/MyClassRoutine
+        public async Task<IActionResult> MyClassRoutine()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // ১. স্টুডেন্টের প্রোফাইল বের করো
+            var student = await _context.Users
+                .Include(u => u.StudentProfile)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (student?.StudentProfile == null) return NotFound();
+
+            // ২. স্টুডেন্টের ডিপার্টমেন্ট ও সেমিস্টার অনুযায়ী রুটিন লোড করো
+            var routines = await _context.ClassRoutines
+                .Include(c => c.Course)
+                    .ThenInclude(co => co.Teacher) // টিচারের নাম দেখার জন্য
+                .Where(c => c.Course.DepartmentId == student.StudentProfile.DepartmentId &&
+                            c.Course.SemesterId == student.StudentProfile.SemesterId)
+                .OrderBy(c => c.Day)        // বার অনুযায়ী সাজানো
+                .ThenBy(c => c.StartTime)   // সময় অনুযায়ী সাজানো
+                .ToListAsync();
+
+            return View(routines);
+        }
     }
 }
