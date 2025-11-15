@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using EMS.Models
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -32,7 +37,6 @@
             letter-spacing: -0.5px;
         }
 
-        /* মেনু আইটেম সেন্টারিং এবং স্টাইল */
         .navbar-nav .nav-link {
             font-weight: 500;
             color: #444 !important;
@@ -45,7 +49,6 @@
                 color: #0d6efd !important;
             }
 
-            /* হোভার ইফেক্ট (নিচে দাগ) */
             .navbar-nav .nav-link::after {
                 content: '';
                 position: absolute;
@@ -61,12 +64,13 @@
                 width: 100%;
             }
 
-        /* ফুটার */
+        /* ফুটার ডিজাইন আপডেট */
         .footer {
             background-color: #fff;
-            border-top: 1px solid #eee;
-            padding: 20px 0;
-            margin-top: 40px;
+            border-top: 1px solid #dee2e6; /* স্পষ্ট বর্ডার */
+            padding: 30px 0;
+            margin-top: auto; /* স্টিকি ফুটার লজিক */
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.02);
         }
     </style>
 </head>
@@ -106,13 +110,21 @@
             </nav>
         </header>
 
-        <div class="container" style="margin-top: 100px;">
+        <div class="container flex-grow-1 mb-5 pb-5" style="margin-top: 120px;">
             @RenderBody()
         </div>
 
         <footer class="footer text-muted mt-auto">
             <div class="container text-center">
-                &copy; 2025 - Education Management System
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-md-start mb-2 mb-md-0">
+                        &copy; 2025 - <span class="fw-bold text-primary">EMS</span>. All rights reserved.
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="#" class="text-decoration-none text-muted me-3">Privacy Policy</a>
+                        <a href="#" class="text-decoration-none text-muted">Terms of Use</a>
+                    </div>
+                </div>
             </div>
         </footer>
     </div>
