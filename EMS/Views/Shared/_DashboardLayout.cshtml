@@ -39,10 +39,30 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="w-100 d-flex justify-content-start ms-3">
-            <a asp-controller="Home" asp-action="Index" class="btn btn-sm btn-outline-secondary border-0 d-flex align-items-center">
+        <div class="w-100 d-flex justify-content-start ms-3 align-items-center">
+
+            <a href="/" class="btn btn-sm btn-outline-secondary border-0 d-flex align-items-center text-decoration-none me-3" title="Go to Website">
                 <i class="fa-solid fa-house me-2"></i> Home
             </a>
+
+            @if (User.IsInRole("Admin"))
+            {
+                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-1 d-flex align-items-center">
+                    <i class="fa-solid fa-user-shield me-2"></i> Admin Panel
+                </span>
+            }
+            else if (User.IsInRole("Teacher"))
+            {
+                <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-1 d-flex align-items-center">
+                    <i class="fa-solid fa-chalkboard-user me-2"></i> Teacher Panel
+                </span>
+            }
+            else if (User.IsInRole("Student"))
+            {
+                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-3 py-2 rounded-1 d-flex align-items-center">
+                    <i class="fa-solid fa-user-graduate me-2"></i> Student Panel
+                </span>
+            }
         </div>
 
         <div class="navbar-nav ms-auto px-4">
@@ -51,18 +71,10 @@
                 {
                     var user = await UserManager.GetUserAsync(User);
                     string displayName = "User";
-
-                    // 👇 প্রোফাইল লিংক ফিক্স করা হয়েছে (সবার জন্য একই) 👇
                     string profileUrl = "/Identity/Account/Manage";
 
-                    if (User.IsInRole("Admin"))
-                    {
-                        displayName = "Admin";
-                    }
-                    else if (user != null)
-                    {
-                        displayName = $"{user.FirstName} {user.LastName}";
-                    }
+                    if (User.IsInRole("Admin")) { displayName = "Admin"; }
+                    else if (user != null) { displayName = $"{user.FirstName} {user.LastName}"; }
 
                     <form class="d-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
                         <button type="submit" class="btn btn-sm text-danger border-0 me-3 fw-bold" style="font-size: 0.9rem;">
