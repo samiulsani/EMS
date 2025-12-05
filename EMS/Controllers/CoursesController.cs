@@ -25,14 +25,14 @@ namespace EMS.Controllers
         // GET: Courses
         public async Task<IActionResult> Index(string searchString, int? departmentId, int? semesterId)
         {
-            // ১. বেসিক কুয়েরি তৈরি (সব রিলেশনশিপসহ)
+            // বেসিক কুয়েরি তৈরি (সব রিলেশনশিপসহ)
             var coursesQuery = _context.Courses
                 .Include(c => c.Department)
                 .Include(c => c.Semester)
-                .Include(c => c.Teacher) // টিচারের নাম দিয়ে সার্চ করার জন্য এটা লাগবে
+                .Include(c => c.Teacher) // টিচারের নাম দিয়ে সার্চ করার জন্য
                 .AsQueryable();
 
-            // ২. সার্চ লজিক (কোর্সের নাম, কোড অথবা টিচারের নাম দিয়ে সার্চ)
+            // সার্চ লজিক (কোর্সের নাম, কোড অথবা টিচারের নাম দিয়ে সার্চ)
             if (!string.IsNullOrEmpty(searchString))
             {
                 coursesQuery = coursesQuery.Where(c =>
@@ -42,26 +42,26 @@ namespace EMS.Controllers
                 );
             }
 
-            // ৩. ডিপার্টমেন্ট ফিল্টার
+            // ডিপার্টমেন্ট ফিল্টার
             if (departmentId.HasValue)
             {
                 coursesQuery = coursesQuery.Where(c => c.DepartmentId == departmentId);
             }
 
-            // ৪. সেমিস্টার ফিল্টার
+            // সেমিস্টার ফিল্টার
             if (semesterId.HasValue)
             {
                 coursesQuery = coursesQuery.Where(c => c.SemesterId == semesterId);
             }
 
-            // ৫. ড্রপডাউনগুলোর জন্য ডেটা লোড করা (ফিল্টার ভ্যালু মনে রাখার জন্য)
+            // ড্রপডাউনগুলোর জন্য ডেটা লোড করা (ফিল্টার ভ্যালু মনে রাখার জন্য)
             ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Name", departmentId);
             ViewData["SemesterId"] = new SelectList(_context.Semesters, "Id", "Name", semesterId);
 
             // সার্চ ভ্যালু মনে রাখার জন্য
             ViewData["CurrentFilter"] = searchString;
 
-            // ৬. ফাইনাল রেজাল্ট
+            // ফাইনাল রেজাল্ট
             return View(await coursesQuery.ToListAsync());
         }
 
@@ -219,12 +219,12 @@ namespace EMS.Controllers
             var course = await _context.Courses
                 .Include(c => c.Department)
                 .Include(c => c.Semester)
-                .Include(c => c.Teacher) // বর্তমান টিচারকে লোড করো
+                .Include(c => c.Teacher) // বর্তমান টিচারকে লোড
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (course == null) return NotFound();
 
-            // শুধুমাত্র ওই ডিপার্টমেন্টের টিচারদের লিস্ট তৈরি করো
+            // শুধুমাত্র ওই ডিপার্টমেন্টের টিচারদের লিস্ট তৈরি
             var teachers = await _context.Users
                 .Include(u => u.TeacherProfile)
                 .Where(u => u.TeacherProfile != null && u.TeacherProfile.DepartmentId == course.DepartmentId) // লজিক: অন্য ডিপার্টমেন্টের টিচার অ্যাসাইন করা যাবে না
@@ -248,7 +248,7 @@ namespace EMS.Controllers
             var course = await _context.Courses.FindAsync(id);
             if (course == null) return NotFound();
 
-            // টিচার আপডেট করো
+            // টিচার আপডেট
             course.TeacherId = TeacherId;
 
             _context.Update(course);

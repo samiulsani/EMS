@@ -21,7 +21,7 @@ namespace EMS.Controllers
         // GET: ClassRoutine
         public async Task<IActionResult> Index(int? departmentId, int? semesterId, string teacherId, DayOfWeekEnum? day)
         {
-            // ১. বেসিক কুয়েরি (সব রিলেশনশিপ সহ)
+            // বেসিক কুয়েরি (সব রিলেশনশিপ সহ)
             var routinesQuery = _context.ClassRoutines
                 .Include(c => c.Course)
                     .ThenInclude(co => co.Department)
@@ -31,7 +31,7 @@ namespace EMS.Controllers
                     .ThenInclude(co => co.Teacher)
                 .AsQueryable();
 
-            // ২. ফিল্টার লজিক
+            // ফিল্টার লজিক
 
             // ডিপার্টমেন্ট ফিল্টার
             if (departmentId.HasValue)
@@ -57,11 +57,11 @@ namespace EMS.Controllers
                 routinesQuery = routinesQuery.Where(r => r.Day == day);
             }
 
-            // ৩. ড্রপডাউন লিস্টের জন্য ডেটা লোড করা
+            // ড্রপডাউন লিস্টের জন্য ডেটা লোড
             ViewBag.DepartmentId = new SelectList(await _context.Departments.ToListAsync(), "Id", "Name", departmentId);
             ViewBag.SemesterId = new SelectList(await _context.Semesters.ToListAsync(), "Id", "Name", semesterId);
 
-            // টিচার লিস্ট (নাম জোড়া লাগিয়ে দেখানোর জন্য)
+            // টিচার লিস্ট
             var teachers = await _context.Users
                 .Include(u => u.TeacherProfile)
                 .Where(u => u.TeacherProfile != null)
@@ -74,7 +74,7 @@ namespace EMS.Controllers
             ViewBag.TeacherId = new SelectList(teachers, "Id", "FullName", teacherId);
 
 
-            // ৪. সাজানো এবং রিটার্ন (বার এবং সময় অনুযায়ী)
+            // সাজানো এবং রিটার্ন (বার এবং সময় অনুযায়ী)
             var routines = await routinesQuery
                 .OrderBy(r => r.Day)
                 .ThenBy(r => r.StartTime)

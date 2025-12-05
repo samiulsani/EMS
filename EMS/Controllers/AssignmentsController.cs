@@ -40,7 +40,7 @@ namespace EMS.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            // টিচারের কোর্সগুলো লোড করো
+            // টিচারের কোর্সগুলো লোড
             var courses = await _context.Courses
                 .Include(c => c.Semester)
                 .Where(c => c.TeacherId == userId)
@@ -66,7 +66,7 @@ namespace EMS.Controllers
             ModelState.Remove("Teacher");
             ModelState.Remove("Course");
 
-            // টিচার আইডি সেট করো
+            // টিচার আইডি সেট
             assignment.TeacherId = userId;
             assignment.CreatedDate = DateTime.Now;
 
@@ -78,7 +78,7 @@ namespace EMS.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Error হলে ড্রপডাউন আবার লোড করো
+            // Error হলে ড্রপডাউন আবার লোড
             var courses = await _context.Courses
                 .Include(c => c.Semester)
                 .Where(c => c.TeacherId == userId)
@@ -109,7 +109,7 @@ namespace EMS.Controllers
             var userId = _userManager.GetUserId(User);
             if (assignment.TeacherId != userId) return RedirectToAction("AccessDenied", "Account", new { area = "Identity" });
 
-            // সাবমিশন লিস্ট লোড করো
+            // সাবমিশন লিস্ট লোড 
             var submissions = await _context.AssignmentSubmissions
                 .Include(s => s.Student)
                 .ThenInclude(u => u.StudentProfile)

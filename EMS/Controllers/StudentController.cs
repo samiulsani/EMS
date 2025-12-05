@@ -14,7 +14,7 @@ using System.Text.Json.Nodes; // JSON থেকে ডেটা বের কর
 
 namespace EMS.Controllers
 {
-    [Authorize(Roles = "Student")] // শুধুমাত্র স্টুডেন্টরা এই কন্ট্রোলারে ঢুকতে পারবে
+    [Authorize(Roles = "Student")] // Only Student Allowed
     public class StudentController : Controller
     {
         private readonly ApplicationDbContext _context; // ডাটাবেস কনটেক্সট
@@ -32,10 +32,10 @@ namespace EMS.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // লগইন করা স্টুডেন্টের আইডি বের করো
+            // লগইন করা স্টুডেন্টের আইডি
             var userId = _userManager.GetUserId(User);
 
-            // স্টুডেন্টের প্রোফাইল তথ্য লোড করো
+            // স্টুডেন্টের প্রোফাইল তথ্য লোড
             var student = await _context.Users
                 .Include(u => u.StudentProfile)
                     .ThenInclude(sp => sp.Department)
@@ -43,7 +43,7 @@ namespace EMS.Controllers
                     .ThenInclude(sp => sp.Semester)
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
-            // স্টুডেন্টদের জন্য নোটিশগুলো লোড করো
+            // স্টুডেন্টদের জন্য নোটিশগুলো লোড
             var notices = await _context.Notices
                 .Where(n => n.IsForStudents == true) // শুধু স্টুডেন্টদের নোটিশ
                 .OrderByDescending(n => n.PostedDate)
@@ -66,17 +66,17 @@ namespace EMS.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            // ১. স্টুডেন্টের প্রোফাইল থেকে তার ডিপার্টমেন্ট ও সেমিস্টার জানো
+            // স্টুডেন্টের প্রোফাইল থেকে তার ডিপার্টমেন্ট ও সেমিস্টার জানো
             var student = await _context.Users
                 .Include(u => u.StudentProfile)
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (student == null || student.StudentProfile == null)
             {
-                return NotFound(); // অথবা এরর পেজে পাঠাতে পারো
+                return NotFound();
             }
 
-            // ২. সেই ডিপার্টমেন্ট ও সেমিস্টারের কোর্সগুলো খুঁজে বের করো (সাথে টিচারের নাম)
+            // সেই ডিপার্টমেন্ট ও সেমিস্টারের কোর্সগুলো খুঁজে (সাথে টিচারের নাম)
             var myCourses = await _context.Courses
                 .Include(c => c.Teacher) // টিচারের নাম দেখানোর জন্য
                 .Where(c => c.DepartmentId == student.StudentProfile.DepartmentId &&
@@ -116,13 +116,13 @@ namespace EMS.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            // ১. এই স্টুডেন্টের সব অ্যাটেনডেন্স রেকর্ড আনো
+            // এই স্টুডেন্টের সব অ্যাটেনডেন্স রেকর্ড
             var records = await _context.StudentAttendances
                 .Include(a => a.Course)
                 .Where(a => a.StudentId == userId)
                 .ToListAsync();
 
-            // ২. কোর্স অনুযায়ী গ্রুপ করে রিপোর্ট তৈরি করো
+            // কোর্স অনুযায়ী গ্রুপ করে রিপোর্ট তৈরি
             var model = records.GroupBy(r => r.Course)
                 .Select(g => new StudentAttendanceViewModel
                 {
@@ -144,7 +144,7 @@ namespace EMS.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            // ১. এই স্টুডেন্টের সব রেজাল্ট লোড করো (সাথে এক্সাম এবং কোর্স ইনফো)
+            // এই স্টুডেন্টের সব রেজাল্ট লোড(সাথে এক্সাম এবং কোর্স ইনফো)
             var results = await _context.ExamResults
                 .Include(r => r.Exam)
                     .ThenInclude(e => e.Course)
@@ -152,7 +152,7 @@ namespace EMS.Controllers
                 .OrderByDescending(r => r.Exam.ExamDate) // লেটেস্ট এক্সাম আগে
                 .ToListAsync();
 
-            // ২. ViewModel-এ ম্যাপ করো
+            // ViewModel-এ ম্যাপ
             var model = results.Select(r => new EMS.Models.ViewModels.StudentResultViewModel
             {
                 CourseCode = r.Exam.Course.CourseCode,
@@ -176,21 +176,21 @@ namespace EMS.Controllers
 
             if (student?.StudentProfile == null) return NotFound();
 
-            // ১. অ্যাসাইনমেন্টগুলো লোড করো
+            // অ্যাসাইনমেন্টগুলো লোড
             var assignments = await _context.Assignments
                 .Include(a => a.Course)
                 .Where(a => a.Course.DepartmentId == student.StudentProfile.DepartmentId &&
                             a.Course.SemesterId == student.StudentProfile.SemesterId)
                 .ToListAsync();
 
-            // ২. সাবমিশনগুলো লোড করো
+            // সাবমিশনগুলো লোড 
             var mySubmissions = await _context.AssignmentSubmissions
                 .Where(s => s.StudentId == userId)
                 .ToListAsync();
 
             ViewBag.MySubmissions = mySubmissions;
 
-            // ৩. সাজানোর লজিক (Sorting Logic)
+            // সাজানোর লজিক (Sorting Logic)
             var sortedAssignments = assignments
                 .OrderBy(a =>
                 {
@@ -231,7 +231,7 @@ namespace EMS.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            // ১. ফাইল চেক
+            // ফাইল চেক
             if (file == null || file.Length == 0)
             {
                 ModelState.AddModelError("", "Please upload a valid file.");
@@ -239,15 +239,15 @@ namespace EMS.Controllers
                 return View(assignment);
             }
 
-            // ২. ফাইল সেভ করার ফোল্ডার পাথ তৈরি (wwwroot/uploads/assignments)
+            // ফাইল সেভ করার ফোল্ডার পাথ তৈরি (wwwroot/uploads/assignments)
             string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "assignments");
             if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
-            // ৩. ইউনিক ফাইলের নাম তৈরি (যাতে নাম কনফ্লিক্ট না হয়)
+            // ইউনিক ফাইলের নাম তৈরি (যাতে নাম কনফ্লিক্ট না হয়)
             string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
             string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-            // ৪. ফাইল কপি করা
+            // ফাইল কপি করা
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(fileStream);
@@ -261,11 +261,11 @@ namespace EMS.Controllers
             // শুধু PDF ফাইল হলে AI চেক করবে
             if (Path.GetExtension(file.FileName).ToLower() == ".pdf")
             {
-                // ১. টেক্সট বের করো
+                // টেক্সট বের করো
                 string pdfContent = ExtractTextFromPdf(filePath); // filePath
                 var assignment = await _context.Assignments.FindAsync(id);
 
-                // ২. যদি পর্যাপ্ত টেক্সট থাকে, তবে জেমিনিকে পাঠাও
+                // যদি পর্যাপ্ত টেক্সট থাকে, তবে জেমিনিকে পাঠাও
                 if (!string.IsNullOrEmpty(pdfContent) && pdfContent.Length > 50)
                 {
                     var aiResult = await GetGeminiAnalysis(pdfContent, assignment.Title, assignment.TotalMarks);
@@ -282,7 +282,7 @@ namespace EMS.Controllers
 
 
 
-            // ৫. ডেটাবেসে সেভ করা
+            // ৫. ডেটাবেসে সেভ
             var submission = new AssignmentSubmission
             {
                 AssignmentId = id,
@@ -304,7 +304,7 @@ namespace EMS.Controllers
         }
 
         // AI ভিত্তিক গ্রেডিং এবং রিভিউ ফাংশন 
-        // ১. পিডিএফ থেকে লেখা বের করার ফাংশন
+        // পিডিএফ থেকে লেখা বের করার ফাংশন
         private string ExtractTextFromPdf(string filePath)
         {
             try
@@ -322,8 +322,8 @@ namespace EMS.Controllers
             catch { return ""; }
         }
 
-        // ২. জেমিনি (AI) ডাকার ফাংশন
-        // ডিবাগিং-এর জন্য ক্লাস আপডেট
+        // জেমিনি (AI) Call ফাংশন
+        
         private class AIResultDTO
         {
             public double marks { get; set; }
@@ -333,7 +333,7 @@ namespace EMS.Controllers
 
         private async Task<AIResultDTO> GetGeminiAnalysis(string studentAnswer, string assignmentTitle, double totalMarks)
         {
-            // ১. appsettings.json থেকে Key এবং URL নেওয়া
+            // appsettings.json থেকে Key এবং URL নেওয়া
             string apiKey = _configuration["Gemini:ApiKey"];
             string baseUrl = _configuration["Gemini:ModelUrl"];
 
@@ -419,14 +419,14 @@ namespace EMS.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            // ১. স্টুডেন্টের প্রোফাইল বের করো
+            // স্টুডেন্টের প্রোফাইল
             var student = await _context.Users
                 .Include(u => u.StudentProfile)
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (student?.StudentProfile == null) return NotFound();
 
-            // ২. স্টুডেন্টের ডিপার্টমেন্ট ও সেমিস্টার অনুযায়ী রুটিন লোড করো
+            // স্টুডেন্টের ডিপার্টমেন্ট ও সেমিস্টার অনুযায়ী রুটিন লোড
             var routines = await _context.ClassRoutines
                 .Include(c => c.Course)
                     .ThenInclude(co => co.Teacher) // টিচারের নাম দেখার জন্য

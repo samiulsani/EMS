@@ -24,7 +24,7 @@ namespace EMS.Controllers
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            _context = context; // <--- context ইনিশিয়ালাইজ করো
+            _context = context; // Initialize the context
         }
 
         public IActionResult Index()
@@ -39,12 +39,12 @@ namespace EMS.Controllers
             return View();
         }
 
-        // --- CreateUser (GET) মেথডটি রিপ্লেস করো ---
+        // --- CreateUser (GET) ---
         public async Task<IActionResult> CreateUser(string source)
         {
-            // ড্রপডাউনের জন্য সব ডেটা লোড করো
+            // ড্রপডাউনের জন্য সব ডেটা লোড
             var roles = await _roleManager.Roles
-                .Where(r => r.Name == "Student" || r.Name == "Teacher") // শুধু স্টুডেন্ট বা টিচার রোল দেখাও
+                .Where(r => r.Name == "Student" || r.Name == "Teacher") // শুধু স্টুডেন্ট বা টিচার রোল
                 .ToListAsync();
 
             var departments = await _context.Departments.ToListAsync();
@@ -57,11 +57,11 @@ namespace EMS.Controllers
                 SemesterList = new SelectList(semesters, "Id", "Name")
             };
 
-            ViewData["Source"] = source; // যেখানে থেকে ক্রিয়েট পেজে এসেছি তা ধরে রাখো
+            ViewData["Source"] = source; // যেখানে থেকে ক্রিয়েট পেজে এসেছি
             return View(model);
         }
 
-        // --- CreateUser (POST) মেথডটি রিপ্লেস করো ---
+        // --- CreateUser (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(CreateUserViewModel model, string source)
@@ -94,7 +94,7 @@ namespace EMS.Controllers
 
             if (ModelState.IsValid)
             {
-                // ধাপ ১: ApplicationUser (লগইন) তৈরি করো
+                // ApplicationUser (লগইন)
                 var user = new ApplicationUser
                 {
                     UserName = model.Email,
@@ -109,10 +109,10 @@ namespace EMS.Controllers
 
                 if (result.Succeeded)
                 {
-                    // ধাপ ২: ইউজারকে রোলে অ্যাসাইন করো
+                    // ইউজারকে রোলে অ্যাসাইন
                     await _userManager.AddToRoleAsync(user, model.Role);
 
-                    // ধাপ ৩: রোল অনুযায়ী প্রোফাইল তৈরি করো
+                    // রোল অনুযায়ী প্রোফাইল তৈরি
                     if (model.Role == "Student")
                     {
                         var studentProfile = new StudentProfile
@@ -142,7 +142,7 @@ namespace EMS.Controllers
                         _context.TeacherProfiles.Add(teacherProfile);
                     }
 
-                    await _context.SaveChangesAsync(); // প্রোফাইল সেভ করো
+                    await _context.SaveChangesAsync(); // প্রোফাইল সেভ
 
                     TempData["SuccessMessage"] = "User created successfully!";
 
@@ -157,7 +157,7 @@ namespace EMS.Controllers
                 }
             }
 
-            // --- Error হলে ড্রপডাউনগুলো আবার লোড করো ---
+            // --- Error হলে ড্রপডাউনগুলো আবার লোড ---
             var roles = await _roleManager.Roles
                 .Where(r => r.Name == "Student" || r.Name == "Teacher")
                 .ToListAsync();
@@ -168,7 +168,7 @@ namespace EMS.Controllers
             model.DepartmentList = new SelectList(departments, "Id", "Name", model.DepartmentId);
             model.SemesterList = new SelectList(semesters, "Id", "Name", model.SemesterId);
 
-            ViewData["Source"] = source;// যেখানে থেকে ক্রিয়েট পেজে এসেছি তা ধরে রাখো
+            ViewData["Source"] = source;
             return View(model);
         }
 
@@ -181,7 +181,7 @@ namespace EMS.Controllers
                 return NotFound();
             }
 
-            // ইউজারকে খুঁজো এবং সাথে তার প্রোফাইল, ডিপার্টমেন্ট ও সেমিস্টার তথ্যও নিয়ে এসো
+            // Find student and gather department, semester info
             var user = await _context.Users
                 .Include(u => u.StudentProfile)
                     .ThenInclude(s => s.Department) // স্টুডেন্টের ডিপার্টমেন্ট
@@ -196,7 +196,7 @@ namespace EMS.Controllers
                 return NotFound();
             }
 
-            ViewData["Source"] = source; // যেখানে থেকে ডিটেইলস পেজে এসেছি তা ধরে রাখো
+            ViewData["Source"] = source; // যেখানে থেকে ডিটেইলস পেজে এসেছি
             return View(user);
         }
 
@@ -231,7 +231,7 @@ namespace EMS.Controllers
                 return NotFound();
             }
 
-            ViewData["Source"] = source; // যেখানে থেকে ডিলিট পেজে এসেছি তা ধরে রাখো
+            ViewData["Source"] = source; // যেখানে থেকে ডিলিট পেজে এসেছি
             return View(user);
         }
 
@@ -240,7 +240,7 @@ namespace EMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id, string source)
         {
-            // ১. নিজের অ্যাকাউন্ট ডিলিট চেক
+            // নিজের অ্যাকাউন্ট ডিলিট চেক
             if (id == _userManager.GetUserId(User))
             {
                 TempData["ErrorMessage"] = "You cannot delete your own account.";
@@ -250,9 +250,9 @@ namespace EMS.Controllers
             var user = await _userManager.FindByIdAsync(id);
             if (user != null)
             {
-                // --- ২. রিলেটেড ডেটা ক্লিনআপ (Manual Cleanup) ---
+                // --- রিলেটেড ডেটা ক্লিনআপ (Manual Cleanup) ---
 
-                // ক. যদি স্টুডেন্ট হয়: তার সব একাডেমিক রেকর্ড মুছতে হবে
+                // যদি স্টুডেন্ট হয়: তার সব একাডেমিক রেকর্ড মুছতে হবে
                 var studentProfile = await _context.StudentProfiles.FindAsync(id);
                 if (studentProfile != null)
                 {
@@ -283,18 +283,16 @@ namespace EMS.Controllers
                         course.TeacherId = null; // কোর্স থাকবে, কিন্তু টিচার থাকবে না
                     }
 
-                    // টিচারের তৈরি অ্যাসাইনমেন্টগুলো? (থাকলে সমস্যা হতে পারে, তবে আপাতত থাক)
-
                     // প্রোফাইল মুছতে হবে
                     _context.TeacherProfiles.Remove(teacherProfile);
                 }
 
-                // ৩. ডাটাবেসে এই পরিবর্তনগুলো সেভ করো
+                // ডাটাবেসে এই পরিবর্তনগুলো সেভ
                 await _context.SaveChangesAsync();
 
                 // -----------------------------------------------
 
-                // ৪. এখন নিরাপদে মেইন ইউজার ডিলিট করো
+                // এখন নিরাপদে মেইন ইউজার ডিলিট 
                 var result = await _userManager.DeleteAsync(user);
 
                 if (result.Succeeded)
@@ -357,7 +355,7 @@ namespace EMS.Controllers
         {
             if (id == null) return NotFound();
 
-            // ইউজার এবং তার প্রোফাইল লোড করো
+            // ইউজার এবং তার প্রোফাইল লোড
             var user = await _context.Users
                 .Include(u => u.StudentProfile)
                 .Include(u => u.TeacherProfile)
@@ -365,11 +363,11 @@ namespace EMS.Controllers
 
             if (user == null) return NotFound();
 
-            // ইউজারের রোল বের করো
+            // ইউজারের রোল বের
             var roles = await _userManager.GetRolesAsync(user);
             var userRole = roles.FirstOrDefault();
 
-            // ViewModel-এ ডেটা লোড করো
+            // ViewModel-এ ডেটা লোড
             var model = new EditUserViewModel
             {
                 Id = user.Id,
@@ -379,12 +377,12 @@ namespace EMS.Controllers
                 PhoneNumber = user.PhoneNumber,
                 Role = userRole,
 
-                // ড্রপডাউন লোড করো
+                // ড্রপডাউন লোড
                 DepartmentList = new SelectList(await _context.Departments.ToListAsync(), "Id", "Name"),
                 SemesterList = new SelectList(await _context.Semesters.ToListAsync(), "Id", "Name")
             };
 
-            // প্রোফাইল থেকে ডেটা নিয়ে ViewModel-এ বসাও
+            // প্রোফাইল থেকে ডেটা নিয়ে ViewModel
             if (userRole == "Student" && user.StudentProfile != null)
             {
                 model.DepartmentId = user.StudentProfile.DepartmentId;
@@ -404,7 +402,7 @@ namespace EMS.Controllers
                 model.Designation = user.TeacherProfile.Designation;
             }
 
-            ViewData["Source"] = source; // যেখানে থেকে এডিট পেজে এসেছি তা ধরে রাখো
+            ViewData["Source"] = source; // যেখানে থেকে এডিট পেজে এসেছি
             return View(model);
         }
 
@@ -419,7 +417,6 @@ namespace EMS.Controllers
             if (model.Role == "Student")
             {
                 if (model.SemesterId == null) ModelState.AddModelError("SemesterId", "Required for Student");
-                // ... অন্যান্য প্রয়োজনীয় ফিল্ড চেক করতে পারো ...
             }
 
             if (ModelState.IsValid)
@@ -431,19 +428,18 @@ namespace EMS.Controllers
 
                 if (user == null) return NotFound();
 
-                // ১. বেসিক ইনফো আপডেট
+                // বেসিক ইনফো আপডেট
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
                 user.PhoneNumber = model.PhoneNumber;
-                // user.Email আপডেট করা সাবধানতার বিষয়, আপাতত বাদ রাখলাম
 
-                // ২. প্রোফাইল আপডেট
+                // প্রোফাইল আপডেট
                 if (model.Role == "Student")
                 {
                     var student = user.StudentProfile;
                     if (student == null)
                     {
-                        // যদি প্রোফাইল না থাকে (অস্বাভাবিক), নতুন বানাও
+                        // যদি প্রোফাইল না থাকে নতুন বানাও
                         student = new StudentProfile { Id = user.Id };
                         _context.StudentProfiles.Add(student);
                     }
@@ -472,7 +468,7 @@ namespace EMS.Controllers
                     teacher.Designation = model.Designation;
                 }
 
-                // ৩. সেভ করো
+                // সেভ
                 await _userManager.UpdateAsync(user); // ইউজার টেবিল আপডেট
                 await _context.SaveChangesAsync(); // প্রোফাইল টেবিল আপডেট
 
@@ -482,7 +478,7 @@ namespace EMS.Controllers
                 return RedirectToAction(nameof(ListUsers));
             }
 
-            // Error হলে ড্রপডাউন আবার পাঠাও
+            // Error হলে ড্রপডাউন
             model.DepartmentList = new SelectList(await _context.Departments.ToListAsync(), "Id", "Name", model.DepartmentId);
             model.SemesterList = new SelectList(await _context.Semesters.ToListAsync(), "Id", "Name", model.SemesterId);
             ViewData["Source"] = source;
@@ -500,7 +496,7 @@ namespace EMS.Controllers
             {
                 var roles = await _userManager.GetRolesAsync(user);
 
-                // যদি রোল ফিল্টার থাকে এবং ইউজারের রোলের সাথে না মিলে, তবে বাদ দাও
+                // যদি রোল ফিল্টার থাকে এবং ইউজারের রোলের সাথে না মিলে
                 if (!string.IsNullOrEmpty(roleFilter) && !roles.Contains(roleFilter))
                 {
                     continue;
@@ -527,16 +523,16 @@ namespace EMS.Controllers
         // GET: Admin/Students
         public async Task<IActionResult> Students(string searchString, int? departmentId, int? semesterId, string session)
         {
-            // ১. বেসিক কুয়েরি তৈরি (এখনো এক্সিকিউট হয়নি)
+            // বেসিক কুয়েরি তৈরি
             var studentsQuery = _context.Users
                 .Include(u => u.StudentProfile)
                     .ThenInclude(sp => sp.Department)
                 .Include(u => u.StudentProfile)
                     .ThenInclude(sp => sp.Semester)
-                .Where(u => u.StudentProfile != null) // শুধুমাত্র স্টুডেন্টদের নাও
+                .Where(u => u.StudentProfile != null) // শুধুমাত্র স্টুডেন্ট
                 .AsQueryable();
 
-            // ২. সার্চ লজিক (নাম অথবা রোল দিয়ে সার্চ)
+            // সার্চ লজিক (নাম অথবা রোল দিয়ে সার্চ)
             if (!string.IsNullOrEmpty(searchString))
             {
                 studentsQuery = studentsQuery.Where(s =>
@@ -545,25 +541,25 @@ namespace EMS.Controllers
                     s.StudentProfile.StudentRoll.Contains(searchString));
             }
 
-            // ৩. ডিপার্টমেন্ট ফিল্টার
+            // ডিপার্টমেন্ট ফিল্টার
             if (departmentId.HasValue)
             {
                 studentsQuery = studentsQuery.Where(s => s.StudentProfile.DepartmentId == departmentId);
             }
 
-            // ৪. সেমিস্টার ফিল্টার
+            // সেমিস্টার ফিল্টার
             if (semesterId.HasValue)
             {
                 studentsQuery = studentsQuery.Where(s => s.StudentProfile.SemesterId == semesterId);
             }
 
-            // ৫. সেশন ফিল্টার
+            // সেশন ফিল্টার
             if (!string.IsNullOrEmpty(session))
             {
                 studentsQuery = studentsQuery.Where(s => s.StudentProfile.Session == session);
             }
 
-            // ৬. ড্রপডাউনগুলোর জন্য ডেটা প্রস্তুত করা
+            // ড্রপডাউনগুলোর জন্য ডেটা প্রস্তুত
             // সেশন লিস্ট (ডেটাবেস থেকে ইউনিক সেশনগুলো বের করা)
             var sessions = await _context.StudentProfiles
                                          .Select(sp => sp.Session)
@@ -577,7 +573,7 @@ namespace EMS.Controllers
             // সার্চ ভ্যালু মনে রাখার জন্য
             ViewData["CurrentFilter"] = searchString;
 
-            // ৭. ফাইনাল রেজাল্ট
+            // ফাইনাল রেজাল্ট
             var students = await studentsQuery.ToListAsync();
             return View(students);
         }
@@ -586,14 +582,14 @@ namespace EMS.Controllers
         // GET: Admin/Teachers
         public async Task<IActionResult> Teachers(string searchString, int? departmentId)
         {
-            // ১. বেসিক কুয়েরি
+            // বেসিক কুয়েরি
             var teachersQuery = _context.Users
                 .Include(u => u.TeacherProfile)
                     .ThenInclude(tp => tp.Department) // ডিপার্টমেন্ট নাম দেখানোর জন্য
-                .Where(u => u.TeacherProfile != null) // শুধু টিচারদের নাও
+                .Where(u => u.TeacherProfile != null) // শুধু টিচারদের
                 .AsQueryable();
 
-            // ২. সার্চ লজিক (নাম অথবা ইমেইল)
+            // সার্চ লজিক (নাম অথবা ইমেইল)
             if (!string.IsNullOrEmpty(searchString))
             {
                 teachersQuery = teachersQuery.Where(t =>
@@ -602,13 +598,13 @@ namespace EMS.Controllers
                     t.Email.Contains(searchString));
             }
 
-            // ৩. ডিপার্টমেন্ট ফিল্টার
+            // ডিপার্টমেন্ট ফিল্টার
             if (departmentId.HasValue)
             {
                 teachersQuery = teachersQuery.Where(t => t.TeacherProfile.DepartmentId == departmentId);
             }
 
-            // ৪. ড্রপডাউন এবং ভিউ ডেটা সেট করা
+            // ড্রপডাউন এবং ভিউ ডেটা সেট করা
             ViewBag.DepartmentId = new SelectList(_context.Departments, "Id", "Name", departmentId);
             ViewData["CurrentFilter"] = searchString;
 
@@ -622,7 +618,7 @@ namespace EMS.Controllers
         {
             var attendanceDate = date ?? DateTime.Now;
 
-            // ১. সব কোর্স লোড করো (অ্যাডমিনের জন্য সব ওপেন)
+            // সব কোর্স লোড(অ্যাডমিনের জন্য সব ওপেন)
             var courses = await _context.Courses
                 .Include(c => c.Department)
                 .Include(c => c.Semester)
@@ -641,7 +637,7 @@ namespace EMS.Controllers
                 return View(new AttendanceViewModel { Date = attendanceDate });
             }
 
-            // ২. স্টুডেন্ট এবং অ্যাটেনডেন্স লোড করা (টিচারের মতোই)
+            // ২. স্টুডেন্ট এবং অ্যাটেনডেন্স লোড করা
             var selectedCourse = courses.FirstOrDefault(c => c.Id == courseId);
             var students = await _context.Users
                 .Include(u => u.StudentProfile)
@@ -681,7 +677,7 @@ namespace EMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ManageAttendance(AttendanceViewModel model)
         {
-            // আগের রেকর্ড মুছে নতুন করে সেভ করা (টিচারের মতোই লজিক)
+            // আগের রেকর্ড মুছে নতুন করে সেভ করা
             var existingRecords = await _context.StudentAttendances
                 .Where(a => a.CourseId == model.CourseId && a.Date.Date == model.Date.Date)
                 .ToListAsync();
@@ -709,29 +705,29 @@ namespace EMS.Controllers
         // GET: Admin/ManageExams
         public async Task<IActionResult> ManageExams(string searchString, int? courseId, ExamType? examType)
         {
-            // ১. এক্সাম ডেটা লোড করো (কোর্স, ডিপার্টমেন্ট, সেমিস্টার, টিচার সহ)
+            // এক্সাম ডেটা লোড করো (কোর্স, ডিপার্টমেন্ট, সেমিস্টার, টিচার সহ)
             var examsQuery = _context.Exams
                 .Include(e => e.Course)
                     .ThenInclude(c => c.Department)
                 .Include(e => e.Course)
                     .ThenInclude(c => c.Semester)
                 .Include(e => e.Course)
-                    .ThenInclude(c => c.Teacher) // কে পরীক্ষা নিয়েছে দেখার জন্য
+                    .ThenInclude(c => c.Teacher) // কে পরীক্ষা নিয়েছে দেখা
                 .AsQueryable();
 
-            // ২. ফিল্টার: নাম দিয়ে সার্চ
+            // ফিল্টার: নাম দিয়ে সার্চ
             if (!string.IsNullOrEmpty(searchString))
             {
                 examsQuery = examsQuery.Where(e => e.Title.Contains(searchString) || e.Course.CourseCode.Contains(searchString));
             }
 
-            // ৩. ফিল্টার: কোর্স অনুযায়ী
+            // ফিল্টার: কোর্স অনুযায়ী
             if (courseId.HasValue)
             {
                 examsQuery = examsQuery.Where(e => e.CourseId == courseId);
             }
 
-            // ৪. ফিল্টার: এক্সামের ধরন (Midterm/Final etc)
+            // ফিল্টার: এক্সামের ধরন (Midterm/Final etc)
             if (examType.HasValue)
             {
                 examsQuery = examsQuery.Where(e => e.ExamType == examType);
@@ -751,7 +747,7 @@ namespace EMS.Controllers
         {
             if (id == null) return NotFound();
 
-            // ১. এক্সাম ইনফো
+            // এক্সাম ইনফো
             var exam = await _context.Exams
                 .Include(e => e.Course)
                     .ThenInclude(c => c.Department)
@@ -761,15 +757,14 @@ namespace EMS.Controllers
 
             if (exam == null) return NotFound();
 
-            // ২. রেজাল্ট এবং স্টুডেন্ট ইনফো লোড করো
+            // রেজাল্ট এবং স্টুডেন্ট ইনফো লোড করো
             var results = await _context.ExamResults
                 .Include(r => r.Student)
                     .ThenInclude(s => s.StudentProfile)
                 .Where(r => r.ExamId == id)
-                .OrderBy(r => r.Student.StudentProfile.StudentRoll) // রোল অনুযায়ী সাজানো
+                .OrderBy(r => r.Student.StudentProfile.StudentRoll)
                 .ToListAsync();
 
-            // ৩. ভিউতে পাঠানোর জন্য ViewBag ব্যবহার করছি (অথবা আলাদা ViewModel বানাতে পারো)
             ViewBag.Exam = exam;
 
             return View(results);
@@ -778,7 +773,7 @@ namespace EMS.Controllers
         // GET: Admin/ManageAssignments
         public async Task<IActionResult> ManageAssignments(string searchString, int? courseId)
         {
-            // ১. সব অ্যাসাইনমেন্ট লোড করো (টিচার, কোর্স, সেমিস্টার সহ)
+            // সব অ্যাসাইনমেন্ট লোড (টিচার, কোর্স, সেমিস্টার সহ)
             var assignmentsQuery = _context.Assignments
                 .Include(a => a.Course)
                     .ThenInclude(c => c.Department)
@@ -787,13 +782,13 @@ namespace EMS.Controllers
                 .Include(a => a.Teacher) // কে অ্যাসাইনমেন্ট দিয়েছে
                 .AsQueryable();
 
-            // ২. সার্চ ফিল্টার
+            // সার্চ ফিল্টার
             if (!string.IsNullOrEmpty(searchString))
             {
                 assignmentsQuery = assignmentsQuery.Where(a => a.Title.Contains(searchString) || a.Course.CourseCode.Contains(searchString));
             }
 
-            // ৩. কোর্স ফিল্টার
+            // কোর্স ফিল্টার
             if (courseId.HasValue)
             {
                 assignmentsQuery = assignmentsQuery.Where(a => a.CourseId == courseId);
@@ -813,7 +808,7 @@ namespace EMS.Controllers
         {
             if (id == null) return NotFound();
 
-            // ১. অ্যাসাইনমেন্ট ডিটেইলস
+            // অ্যাসাইনমেন্ট ডিটেইলস
             var assignment = await _context.Assignments
                 .Include(a => a.Course)
                     .ThenInclude(c => c.Department)
@@ -823,7 +818,7 @@ namespace EMS.Controllers
 
             if (assignment == null) return NotFound();
 
-            // ২. সাবমিশন লিস্ট লোড করো
+            // সাবমিশন লিস্ট লোড
             var submissions = await _context.AssignmentSubmissions
                 .Include(s => s.Student)
                     .ThenInclude(u => u.StudentProfile)
