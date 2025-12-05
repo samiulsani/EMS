@@ -25,6 +25,10 @@ namespace EMS.Models.ViewModels
         public string StudentId { get; set; }
         public string Name { get; set; }
         public string RollNo { get; set; }
-        public bool IsSelected { get; set; } = true; // ডিফল্টভাবে সিলেক্ট করা থাকবে
+        public bool IsSelected { get; set; }
+
+        // --- নতুন প্রপার্টি ---
+        public int FailedCount { get; set; } // কয়টি সাবজেক্টে ফেইল
+        public string StatusMessage { get; set; } // মেসেজ (All Clear / Failed)
     }
 }

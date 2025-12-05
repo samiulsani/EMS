@@ -7,7 +7,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h2 class="text-primary fw-bold"><i class="fa-solid fa-user-graduate me-2"></i> Promote Students</h2>
-        <p class="text-muted mb-0">Batch update student semesters.</p>
+        <p class="text-muted mb-0">Select passed students to promote them to the next semester.</p>
     </div>
     <a asp-action="Students" class="btn btn-outline-secondary">Back to List</a>
 </div>
@@ -15,17 +15,17 @@
 <div class="card shadow-sm border-0 mb-4">
     <div class="card-body p-4">
         <form method="get" asp-action="PromoteStudents">
-            <div class="row g-3 align-items-end mb-4">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold text-muted">Select Department</label>
+            <div class="row g-3 align-items-end mb-4 bg-light p-3 rounded border">
+                <div class="col-md-5">
+                    <label class="form-label fw-bold text-muted small text-uppercase">Select Department</label>
                     <select name="departmentId" class="form-select" asp-items="Model.DepartmentList" onchange="this.form.submit()">
                         <option value="">-- Select Department --</option>
                     </select>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-bold text-muted">Select Current Semester</label>
+                <div class="col-md-5">
+                    <label class="form-label fw-bold text-muted small text-uppercase">Select Current Semester</label>
                     <select name="currentSemesterId" class="form-select" asp-items="Model.SemesterList" onchange="this.form.submit()">
-                        <option value="">-- Select Current Semester --</option>
+                        <option value="">-- Select Semester --</option>
                     </select>
                 </div>
             </div>
@@ -39,51 +39,76 @@
 
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger small"></div>
 
-                <div class="mb-4 p-3 bg-light rounded border border-warning">
-                    <label asp-for="NextSemesterId" class="form-label fw-bold text-dark">Promote To (Target Semester)</label>
-                    <select asp-for="NextSemesterId" class="form-select border-warning" asp-items="Model.SemesterList" required>
-                        <option value="">-- Select Next Semester --</option>
-                    </select>
+                <div class="mb-4">
+                    <label asp-for="NextSemesterId" class="form-label fw-bold text-dark h5">Promote To (Target Semester)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-success text-white"><i class="fa-solid fa-arrow-up"></i></span>
+                        <select asp-for="NextSemesterId" class="form-select border-success" asp-items="Model.SemesterList" required>
+                            <option value="">-- Select Target Semester --</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="table-responsive mb-4">
-                    <table class="table table-hover align-middle">
+                    <table class="table table-hover align-middle border">
                         <thead class="bg-light">
                             <tr>
                                 <th style="width: 50px;">
-                                    <input type="checkbox" id="selectAll" class="form-check-input" checked />
+                                    <input type="checkbox" id="selectAll" class="form-check-input" />
                                 </th>
                                 <th>Roll No</th>
                                 <th>Student Name</th>
+                                <th>Result Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             @for (int i = 0; i < Model.Students.Count; i++)
                             {
-                                <tr>
+                                // ফেইল করলে রো-টি একটু লালচে হবে
+                                var rowClass = Model.Students[i].FailedCount > 0 ? "table-danger bg-opacity-10" : "";
+
+                                <tr class="@rowClass">
                                     <td>
                                         <input type="hidden" asp-for="Students[i].StudentId" />
                                         <input type="hidden" asp-for="Students[i].Name" />
                                         <input type="hidden" asp-for="Students[i].RollNo" />
+
                                         <input asp-for="Students[i].IsSelected" class="form-check-input student-checkbox" />
                                     </td>
                                     <td class="fw-bold">@Model.Students[i].RollNo</td>
                                     <td>@Model.Students[i].Name</td>
+                                    <td>
+                                        @if (Model.Students[i].FailedCount > 0)
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="fa-solid fa-triangle-exclamation me-1"></i> @Model.Students[i].StatusMessage
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="fa-solid fa-check me-1"></i> @Model.Students[i].StatusMessage
+                                            </span>
+                                        }
+                                    </td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 </div>
 
-                <button type="submit" class="btn btn-success fw-bold px-4">
-                    <i class="fa-solid fa-arrow-up-right-from-square me-2"></i> Confirm Promotion
-                </button>
+                <div class="d-grid d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-success fw-bold px-5 shadow">
+                        <i class="fa-solid fa-user-check me-2"></i> Confirm Promotion
+                    </button>
+                </div>
             </form>
         }
         else if (Model.DepartmentId != 0 && Model.CurrentSemesterId != 0)
         {
-            <div class="alert alert-info text-center">
-                No students found in this semester.
+            <div class="text-center py-5 text-muted">
+                <i class="fa-solid fa-users-slash fa-3x mb-3 opacity-25"></i>
+                <h5>No students found in this semester.</h5>
             </div>
         }
     </div>
@@ -91,7 +116,6 @@
 
 @section Scripts {
     <script>
-        // Select All চেকবক্স লজিক
         document.getElementById('selectAll').addEventListener('change', function() {
             var checkboxes = document.querySelectorAll('.student-checkbox');
             for (var checkbox of checkboxes) {

@@ -834,7 +834,6 @@ namespace EMS.Controllers
         // GET: Admin/PromoteStudents
         public async Task<IActionResult> PromoteStudents(int? departmentId, int? currentSemesterId)
         {
-            // ১. ড্রপডাউন ডেটা লোড
             var departments = await _context.Departments.ToListAsync();
             var semesters = await _context.Semesters.ToListAsync();
 
@@ -846,7 +845,6 @@ namespace EMS.Controllers
                 CurrentSemesterId = currentSemesterId ?? 0
             };
 
-            // ২. যদি ডিপার্টমেন্ট এবং সেমিস্টার সিলেক্ট করা থাকে, তবে স্টুডেন্ট লোড করো
             if (departmentId.HasValue && currentSemesterId.HasValue)
             {
                 var students = await _context.Users
@@ -857,12 +855,48 @@ namespace EMS.Controllers
                     .OrderBy(u => u.StudentProfile.StudentRoll)
                     .ToListAsync();
 
-                model.Students = students.Select(s => new StudentPromoteItem
-                {
-                    StudentId = s.Id,
-                    Name = s.FirstName + " " + s.LastName,
-                    RollNo = s.StudentProfile.StudentRoll,
-                    IsSelected = true
+                // ১. এই সেমিস্টার ও ডিপার্টমেন্টের সব এক্সাম লোড করো
+                var currentExams = await _context.Exams
+                    .Include(e => e.Course)
+                    .Where(e => e.Course.DepartmentId == departmentId && e.Course.SemesterId == currentSemesterId)
+                    .ToListAsync();
+
+                var examIds = currentExams.Select(e => e.Id).ToList();
+
+                // ২. এই এক্সামগুলোর সব রেজাল্ট লোড করো
+                var results = await _context.ExamResults
+                    .Where(r => examIds.Contains(r.ExamId))
+                    .ToListAsync();
+
+                // ৩. প্রতিটি স্টুডেন্টের পাস/ফেইল চেক করো
+                model.Students = students.Select(s => {
+
+                    var studentResults = results.Where(r => r.StudentId == s.Id).ToList();
+                    int failCount = 0;
+
+                    // লজিক: ৪০% এর কম পেলে ফেইল
+                    foreach (var result in studentResults)
+                    {
+                        var exam = currentExams.FirstOrDefault(e => e.Id == result.ExamId);
+                        if (exam != null && result.MarksObtained < (exam.TotalMarks * 0.40))
+                        {
+                            failCount++;
+                        }
+                    }
+
+                    return new StudentPromoteItem
+                    {
+                        StudentId = s.Id,
+                        Name = $"{s.FirstName} {s.LastName}",
+                        RollNo = s.StudentProfile.StudentRoll,
+                        FailedCount = failCount,
+
+                        // যদি ১টাও ফেইল থাকে, তবে মেসেজ দেখাও
+                        StatusMessage = failCount > 0 ? $"Failed in {failCount} Exam(s)" : "All Clear",
+
+                        // যদি ফেইল না করে থাকে, তবেই অটোমেটিক সিলেক্ট হবে
+                        IsSelected = (failCount == 0)
+                    };
                 }).ToList();
             }
 
