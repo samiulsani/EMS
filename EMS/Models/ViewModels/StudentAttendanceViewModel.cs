@@ -9,6 +9,9 @@
         public int Late { get; set; }
         public int Absent { get; set; }
 
+        // --- নতুন প্রপার্টি ---
+        public string SemesterName { get; set; }
+
         // উপস্থিতির হার (Present + Late কে উপস্থিত ধরা হলো)
         public double Percentage => TotalClasses == 0 ? 0 :
             Math.Round(((double)(Present + Late) / TotalClasses) * 100, 2);

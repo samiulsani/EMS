@@ -1,78 +1,172 @@
 ﻿@model EMS.Models.ApplicationUser
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "User Details";
+    var examResults = ViewBag.ExamResults as List<EMS.Models.ViewModels.StudentResultViewModel>;
+    var attendanceStats = ViewBag.AttendanceStats as List<EMS.Models.ViewModels.StudentAttendanceViewModel>;
 }
 
 <div class="row justify-content-center">
     <div class="col-md-10">
-        <div class="card shadow-sm border-0 mt-4">
-            <div class="card-header bg-info text-white py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-circle-info me-2"></i> User Profile</h5>
-                <a href="@(ViewData["Source"]?.ToString() == "Students" ? "/Admin/Students" : ViewData["Source"]?.ToString() == "Teachers" ? "/Admin/Teachers" : "/Admin/ListUsers")" class="btn btn-sm btn-light text-info fw-bold"><i class="fa-solid fa-arrow-left me-1"></i> Back</a>
-            </div>
-            <div class="card-body p-4">
-                <div class="row">
-                    <div class="col-md-4 text-center border-end">
-                        <div class="bg-light rounded-circle d-inline-flex p-4 mb-3 text-secondary border">
-                            <i class="fa-solid fa-user fa-4x"></i>
-                        </div>
-                        <h4 class="fw-bold text-primary">@Model.FirstName @Model.LastName</h4>
-                        <p class="text-muted mb-1">@Model.Email</p>
-                        <p class="text-muted small"><i class="fa-solid fa-phone me-1"></i> @Model.PhoneNumber</p>
 
-                        <div class="mt-3">
-                            @if (Model.StudentProfile != null)
-                            {
-                                <span class="badge bg-success px-3 py-2">Student</span>
-                            }
-                            else if (Model.TeacherProfile != null)
-                            {
+        <ul class="nav nav-tabs mb-4" id="userTab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active fw-bold" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button">Profile Info</button>
+            </li>
+            @if (Model.StudentProfile != null)
+            {
+                <li class="nav-item">
+                    <button class="nav-link fw-bold" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button">Academic History</button>
+                </li>
+            }
+        </ul>
 
-                                <span class="badge bg-info text-dark px-3 py-2">Teacher</span>
-                            }
-                            else
-                            {
+        <div class="tab-content" id="userTabContent">
 
-                                <span class="badge bg-secondary px-3 py-2">Admin / Staff</span>
-                            }
-                        </div>
+            <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-info text-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold"><i class="fa-solid fa-circle-info me-2"></i> Basic Profile</h5>
+                        <a href="@(ViewData["Source"]?.ToString() == "Students" ? "/Admin/Students" : ViewData["Source"]?.ToString() == "Teachers" ? "/Admin/Teachers" : "/Admin/ListUsers")" class="btn btn-sm btn-light text-info fw-bold"><i class="fa-solid fa-arrow-left me-1"></i> Back</a>
                     </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-4 text-center border-end">
+                                <div class="bg-light rounded-circle d-inline-flex p-4 mb-3 text-secondary border">
+                                    <i class="fa-solid fa-user fa-4x"></i>
+                                </div>
+                                <h4 class="fw-bold text-primary">@Model.FirstName @Model.LastName</h4>
+                                <p class="text-muted mb-1">@Model.Email</p>
+                                <p class="text-muted small"><i class="fa-solid fa-phone me-1"></i> @Model.PhoneNumber</p>
+                                <div class="mt-3">
+                                    @if (Model.StudentProfile != null)
+                                    {
+                                        <span class="badge bg-success px-3 py-2">Student</span>
+                                    }
+                                    else if (Model.TeacherProfile != null)
+                                    {
 
-                    <div class="col-md-8 ps-md-4">
-                        @if (Model.StudentProfile != null)
-                        {
-                            <h6 class="text-success fw-bold mb-3 border-bottom pb-2">Academic Info</h6>
-                            <div class="row g-3 mb-4">
-                                <div class="col-6"><small class="text-muted d-block">Roll No</small><span class="fw-bold">@Model.StudentProfile.StudentRoll</span></div>
-                                <div class="col-6"><small class="text-muted d-block">Reg No</small><span class="fw-bold">@Model.StudentProfile.RegistrationNo</span></div>
-                                <div class="col-6"><small class="text-muted d-block">Department</small><span class="fw-bold">@Model.StudentProfile.Department?.Name</span></div>
-                                <div class="col-6"><small class="text-muted d-block">Semester</small><span class="fw-bold">@Model.StudentProfile.Semester?.Name</span></div>
-                                <div class="col-6"><small class="text-muted d-block">Session</small><span class="fw-bold">@Model.StudentProfile.Session</span></div>
+                                        <span class="badge bg-info text-dark px-3 py-2">Teacher</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="badge bg-secondary px-3 py-2">Admin / Staff</span>
+                                    }
+                                </div>
                             </div>
-                            <h6 class="text-muted fw-bold mb-3 border-bottom pb-2">Personal Info</h6>
-                            <div class="row g-3">
-                                <div class="col-6"><small class="text-muted d-block">Father Name</small><span class="fw-bold">@Model.StudentProfile.FatherName</span></div>
-                                <div class="col-6"><small class="text-muted d-block">Mother Name</small><span class="fw-bold">@Model.StudentProfile.MotherName</span></div>
-                                <div class="col-12"><small class="text-muted d-block">Address</small><span class="fw-bold">@Model.StudentProfile.Address</span></div>
+                            <div class="col-md-8 ps-md-4">
+                                @if (Model.StudentProfile != null)
+                                {
+                                    <h6 class="text-success fw-bold mb-3 border-bottom pb-2">Current Academic Info</h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-6"><small class="text-muted d-block">Roll No</small><span class="fw-bold">@Model.StudentProfile.StudentRoll</span></div>
+                                        <div class="col-6"><small class="text-muted d-block">Department</small><span class="fw-bold">@Model.StudentProfile.Department?.Name</span></div>
+                                        <div class="col-6"><small class="text-muted d-block">Current Semester</small><span class="badge bg-warning text-dark">@Model.StudentProfile.Semester?.Name</span></div>
+                                        <div class="col-6"><small class="text-muted d-block">Session</small><span class="fw-bold">@Model.StudentProfile.Session</span></div>
+                                    </div>
+                                    <h6 class="text-muted fw-bold mb-3 border-bottom pb-2">Personal Info</h6>
+                                    <div class="row g-3">
+                                        <div class="col-6"><small class="text-muted d-block">Father's Name</small><span class="fw-bold">@Model.StudentProfile.FatherName</span></div>
+                                        <div class="col-6"><small class="text-muted d-block">Address</small><span class="fw-bold">@Model.StudentProfile.Address</span></div>
+                                    </div>
+                                }
+                                else if (Model.TeacherProfile != null)
+                                {
+                                    <h6 class="text-info fw-bold mb-3 border-bottom pb-2">Professional Info</h6>
+                                    <div class="row g-3">
+                                        <div class="col-6"><small class="text-muted d-block">Designation</small><span class="fw-bold text-primary">@Model.TeacherProfile.Designation</span></div>
+                                        <div class="col-6"><small class="text-muted d-block">Department</small><span class="fw-bold">@Model.TeacherProfile.Department?.Name</span></div>
+                                    </div>
+                                }
                             </div>
-                        }
-                        else if (Model.TeacherProfile != null)
-                        {
-                            <h6 class="text-info fw-bold mb-3 border-bottom pb-2">Professional Info</h6>
-                            <div class="row g-3">
-                                <div class="col-6"><small class="text-muted d-block">Designation</small><span class="fw-bold text-primary">@Model.TeacherProfile.Designation</span></div>
-                                <div class="col-6"><small class="text-muted d-block">Department</small><span class="fw-bold">@Model.TeacherProfile.Department?.Name</span></div>
-                            </div>
-                        }
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="card-footer bg-light text-end p-3">
-                <a asp-action="Edit" asp-route-id="@Model.Id" asp-route-source="@ViewData["Source"]" class="btn btn-warning fw-bold px-4">
-                    <i class="fa-solid fa-pen me-2"></i> Edit
-                </a>
-            </div>
+
+            @if (Model.StudentProfile != null)
+            {
+                <div class="tab-pane fade" id="history" role="tabpanel">
+
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="mb-0 fw-bold text-primary"><i class="fa-solid fa-square-poll-vertical me-2"></i> Exam Results History</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            @if (examResults != null && examResults.Any())
+                            {
+                                var groupedResults = examResults.GroupBy(r => r.SemesterName);
+                                @foreach (var group in groupedResults)
+                                {
+                                    <div class="p-3 bg-light border-bottom fw-bold text-dark">@group.Key</div>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0 align-middle">
+                                            <thead class="table-light">
+                                                <tr><th>Course</th><th>Exam</th><th>Marks</th><th>Grade</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in group)
+                                                {
+                                                    <tr>
+                                                        <td>@item.CourseCode <span class="text-muted small">@item.CourseTitle</span></td>
+                                                        <td>@item.ExamTitle</td>
+                                                        <td>@item.MarksObtained / @item.TotalMarks</td>
+                                                        <td><span class="badge bg-@item.GradeColor">@item.Grade</span></td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="p-4 text-center text-muted">No exam results found.</div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="mb-0 fw-bold text-success"><i class="fa-solid fa-chart-pie me-2"></i> Attendance History</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            @if (attendanceStats != null && attendanceStats.Any())
+                            {
+                                var groupedAttendance = attendanceStats.GroupBy(a => a.SemesterName);
+                                @foreach (var group in groupedAttendance)
+                                {
+                                    <div class="p-3 bg-light border-bottom fw-bold text-dark">@group.Key</div>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0 align-middle">
+                                            <thead class="table-light">
+                                                <tr><th>Course</th><th class="text-center">Total</th><th class="text-center">Present</th><th class="text-center">%</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in group)
+                                                {
+                                                    <tr>
+                                                        <td>@item.CourseCode</td>
+                                                        <td class="text-center">@item.TotalClasses</td>
+                                                        <td class="text-center text-success fw-bold">@item.Present</td>
+                                                        <td class="text-center fw-bold">@item.Percentage%</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="p-4 text-center text-muted">No attendance records found.</div>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+            }
         </div>
     </div>
 </div>

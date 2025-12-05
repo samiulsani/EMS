@@ -9,6 +9,9 @@
         public double TotalMarks { get; set; }
         public double MarksObtained { get; set; }
 
+        // --- নতুন প্রপার্টি ---
+        public string SemesterName { get; set; }
+
         // --- গ্রেড ক্যালকুলেশন লজিক (Read-Only Property) ---
         public string Grade
         {

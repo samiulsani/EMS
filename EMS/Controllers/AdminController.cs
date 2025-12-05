@@ -176,27 +176,73 @@ namespace EMS.Controllers
         // GET: Admin/Details/5
         public async Task<IActionResult> Details(string id, string source)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            // Find student and gather department, semester info
             var user = await _context.Users
                 .Include(u => u.StudentProfile)
-                    .ThenInclude(s => s.Department) // স্টুডেন্টের ডিপার্টমেন্ট
+                    .ThenInclude(s => s.Department)
                 .Include(u => u.StudentProfile)
-                    .ThenInclude(s => s.Semester)   // স্টুডেন্টের সেমিস্টার
+                    .ThenInclude(s => s.Semester)
                 .Include(u => u.TeacherProfile)
-                    .ThenInclude(t => t.Department) // টিচারের ডিপার্টমেন্ট
+                    .ThenInclude(t => t.Department)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
-            if (user == null)
-            {
-                return NotFound();
-            }
+            if (user == null) return NotFound();
 
-            ViewData["Source"] = source; // যেখানে থেকে ডিটেইলস পেজে এসেছি
+            // --- নতুন অংশ: একাডেমিক হিস্ট্রি লোড ---
+            if (user.StudentProfile != null)
+            {
+                // ১. সব রেজাল্ট আনো (সেমিস্টার সহ)
+                var results = await _context.ExamResults
+                    .Include(r => r.Exam)
+                        .ThenInclude(e => e.Course)
+                            .ThenInclude(c => c.Semester)
+                    .Where(r => r.StudentId == id)
+                    .ToListAsync();
+
+                var resultList = results.Select(r => new EMS.Models.ViewModels.StudentResultViewModel
+                {
+                    CourseCode = r.Exam.Course.CourseCode,
+                    CourseTitle = r.Exam.Course.Title,
+                    ExamTitle = r.Exam.Title,
+                    ExamDate = r.Exam.ExamDate,
+                    TotalMarks = r.Exam.TotalMarks,
+                    MarksObtained = r.MarksObtained,
+                    SemesterName = r.Exam.Course.Semester.Name // সেমিস্টার নাম সেট করা হলো
+                })
+                .OrderBy(r => r.SemesterName) // সেমিস্টার অনুযায়ী সাজানো
+                .ThenBy(r => r.CourseCode)
+                .ToList();
+
+                ViewBag.ExamResults = resultList;
+
+                // ২. সব অ্যাটেনডেন্স আনো (সেমিস্টার সহ)
+                var attendanceData = await _context.StudentAttendances
+                    .Include(a => a.Course)
+                        .ThenInclude(c => c.Semester)
+                    .Where(a => a.StudentId == id)
+                    .ToListAsync();
+
+                var attendanceList = attendanceData
+                    .GroupBy(a => new { a.Course.CourseCode, a.Course.Title, Semester = a.Course.Semester.Name })
+                    .Select(g => new EMS.Models.ViewModels.StudentAttendanceViewModel
+                    {
+                        CourseCode = g.Key.CourseCode,
+                        CourseTitle = g.Key.Title,
+                        SemesterName = g.Key.Semester, // সেমিস্টার নাম
+                        TotalClasses = g.Count(),
+                        Present = g.Count(x => x.Status == AttendanceStatus.Present),
+                        Late = g.Count(x => x.Status == AttendanceStatus.Late),
+                        Absent = g.Count(x => x.Status == AttendanceStatus.Absent)
+                    })
+                    .OrderBy(x => x.SemesterName)
+                    .ToList();
+
+                ViewBag.AttendanceStats = attendanceList;
+            }
+            // ---------------------------------------
+
+            ViewData["Source"] = source;
             return View(user);
         }
 
