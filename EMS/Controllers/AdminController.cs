@@ -830,6 +830,90 @@ namespace EMS.Controllers
             return View(submissions);
         }
 
+
+        // GET: Admin/PromoteStudents
+        public async Task<IActionResult> PromoteStudents(int? departmentId, int? currentSemesterId)
+        {
+            // ১. ড্রপডাউন ডেটা লোড
+            var departments = await _context.Departments.ToListAsync();
+            var semesters = await _context.Semesters.ToListAsync();
+
+            var model = new PromoteStudentViewModel
+            {
+                DepartmentList = new SelectList(departments, "Id", "Name", departmentId),
+                SemesterList = new SelectList(semesters, "Id", "Name", currentSemesterId),
+                DepartmentId = departmentId ?? 0,
+                CurrentSemesterId = currentSemesterId ?? 0
+            };
+
+            // ২. যদি ডিপার্টমেন্ট এবং সেমিস্টার সিলেক্ট করা থাকে, তবে স্টুডেন্ট লোড করো
+            if (departmentId.HasValue && currentSemesterId.HasValue)
+            {
+                var students = await _context.Users
+                    .Include(u => u.StudentProfile)
+                    .Where(u => u.StudentProfile != null &&
+                                u.StudentProfile.DepartmentId == departmentId &&
+                                u.StudentProfile.SemesterId == currentSemesterId)
+                    .OrderBy(u => u.StudentProfile.StudentRoll)
+                    .ToListAsync();
+
+                model.Students = students.Select(s => new StudentPromoteItem
+                {
+                    StudentId = s.Id,
+                    Name = s.FirstName + " " + s.LastName,
+                    RollNo = s.StudentProfile.StudentRoll,
+                    IsSelected = true
+                }).ToList();
+            }
+
+            return View(model);
+        }
+
+        // POST: Admin/PromoteStudents
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PromoteStudents(PromoteStudentViewModel model)
+        {
+            // ১. ভ্যালিডেশন
+            if (model.CurrentSemesterId == model.NextSemesterId)
+            {
+                ModelState.AddModelError("", "Current and Next semester cannot be the same.");
+            }
+
+            // ২. সিলেক্টেড স্টুডেন্টদের খুঁজে বের করে আপডেট করা
+            var selectedStudentIds = model.Students.Where(s => s.IsSelected).Select(s => s.StudentId).ToList();
+
+            if (selectedStudentIds.Any())
+            {
+                var studentsToPromote = await _context.StudentProfiles
+                    .Where(sp => selectedStudentIds.Contains(sp.Id))
+                    .ToListAsync();
+
+                foreach (var profile in studentsToPromote)
+                {
+                    profile.SemesterId = model.NextSemesterId; // সেমিস্টার আপডেট
+                }
+
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"Successfully promoted {selectedStudentIds.Count} students!";
+
+                return RedirectToAction(nameof(Students));
+            }
+            else
+            {
+                ModelState.AddModelError("", "No students selected for promotion.");
+            }
+
+            // এরর হলে পেজ রিলোড
+            var departments = await _context.Departments.ToListAsync();
+            var semesters = await _context.Semesters.ToListAsync();
+            model.DepartmentList = new SelectList(departments, "Id", "Name", model.DepartmentId);
+            model.SemesterList = new SelectList(semesters, "Id", "Name", model.CurrentSemesterId);
+
+            return View(model);
+        }
+
+
         //Admin Dashboard Data passing for chart and information
         // GET: Admin/GetDashboardStats (AJAX Call এর জন্য)
         [HttpGet]

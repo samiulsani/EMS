@@ -24,7 +24,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
 
     var db = services.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate();
+    //db.Database.Migrate();
 
     var configuration = services.GetRequiredService<IConfiguration>();
     await SeedData.SeedRolesAndAdminAsync(services, configuration);
