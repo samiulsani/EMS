@@ -1,0 +1,105 @@
+﻿@model EMS.Models.ViewModels.TeacherEvaluationViewModel
+
+@{
+    ViewData["Title"] = "Rate Teacher";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-primary text-white py-3 text-center">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-star-half-stroke me-2"></i> Rate Your Instructor</h5>
+                <p class="mb-0 small opacity-75">Your feedback is anonymous and valuable.</p>
+            </div>
+            <div class="card-body p-4">
+
+                <div class="text-center mb-4">
+                    <div class="bg-light rounded-circle d-inline-flex p-3 mb-2 text-primary shadow-sm">
+                        <i class="fa-solid fa-user-tie fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark">@Model.TeacherName</h4>
+                    <p class="text-muted mb-0">@Model.CourseCode - @Model.CourseTitle</p>
+                </div>
+
+                <form asp-action="RateTeacher" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small text-center"></div>
+
+                    <input type="hidden" asp-for="CourseId" />
+                    <input type="hidden" asp-for="TeacherId" />
+                    <input type="hidden" asp-for="TeacherName" />
+                    <input type="hidden" asp-for="CourseCode" />
+                    <input type="hidden" asp-for="CourseTitle" />
+
+                    <div class="mb-4 text-center">
+                        <label class="form-label fw-bold text-muted mb-2">How was your experience?</label>
+
+                        <div class="rating-wrapper">
+                            <input type="radio" asp-for="Rating" value="5" id="star5">
+                            <label for="star5"><i class="fa-solid fa-star"></i></label>
+
+                            <input type="radio" asp-for="Rating" value="4" id="star4">
+                            <label for="star4"><i class="fa-solid fa-star"></i></label>
+
+                            <input type="radio" asp-for="Rating" value="3" id="star3">
+                            <label for="star3"><i class="fa-solid fa-star"></i></label>
+
+                            <input type="radio" asp-for="Rating" value="2" id="star2">
+                            <label for="star2"><i class="fa-solid fa-star"></i></label>
+
+                            <input type="radio" asp-for="Rating" value="1" id="star1">
+                            <label for="star1"><i class="fa-solid fa-star"></i></label>
+                        </div>
+
+                        <span asp-validation-for="Rating" class="text-danger d-block mt-2 small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Comment" class="form-label fw-bold text-muted">Your Feedback</label>
+                        <textarea asp-for="Comment" class="form-control bg-light" rows="4" placeholder="Share your thoughts... (e.g. Teaching style, punctuality)"></textarea>
+                        <span asp-validation-for="Comment" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary fw-bold py-2 shadow-sm">
+                            Submit Review <i class="fa-solid fa-paper-plane ms-2"></i>
+                        </button>
+                        <a asp-action="EvaluationList" class="btn btn-light text-muted border">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rating-wrapper {
+        display: flex;
+        flex-direction: row-reverse; /* ডান থেকে বামে সাজানো */
+        justify-content: center;
+        gap: 5px;
+    }
+
+        .rating-wrapper input {
+            display: none; /* রেডিও বাটন লুকানো */
+        }
+
+        .rating-wrapper label {
+            font-size: 2.5rem;
+            color: #ddd; /* ডিফল্ট কালার */
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+            /* হোভার ইফেক্ট: উল্টো দিক থেকে কালার ফিল হবে */
+            .rating-wrapper label:hover,
+            .rating-wrapper label:hover ~ label,
+            .rating-wrapper input:checked ~ label {
+                color: #ffc107; /* গোল্ডেন কালার */
+            }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

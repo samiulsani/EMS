@@ -1,0 +1,58 @@
+﻿@model EMS.Models.ViewModels.TeacherEvaluationReportViewModel
+
+@{
+    ViewData["Title"] = "Evaluation Details";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="text-primary fw-bold mb-1">Feedback for @Model.TeacherName</h2>
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-primary fs-6">Average: @Model.AverageRating <i class="fa-solid fa-star"></i></span>
+            <span class="text-muted">Total Reviews: @Model.Comments.Count</span>
+        </div>
+    </div>
+    <a asp-action="TeacherEvaluations" class="btn btn-outline-secondary">Back to List</a>
+</div>
+
+<div class="row g-4">
+    @if (Model.Comments.Any())
+    {
+        @foreach (var review in Model.Comments)
+        {
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="badge bg-light text-dark border me-1">@review.CourseCode</span>
+
+                                <span class="badge bg-info bg-opacity-10 text-info border border-info">@review.Semester</span>
+                            </div>
+
+                            <div class="text-warning">
+                                @for (int i = 0; i < review.Rating; i++)
+                                {
+                                    <i class="fa-solid fa-star"></i>
+                                }
+                            </div>
+                        </div>
+
+                        <p class="card-text text-dark fst-italic">"@review.Comment"</p>
+
+                        <small class="text-muted d-block text-end mt-3">
+                            <i class="fa-regular fa-clock me-1"></i> @review.Date.ToString("dd MMM yyyy")
+                        </small>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fa-solid fa-comment-slash fa-3x mb-3 opacity-25"></i>
+            <h5>No feedback available yet.</h5>
+        </div>
+    }
+</div>

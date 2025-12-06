@@ -180,6 +180,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link @(currentAction == "TeacherEvaluations" ? "active" : "")"
+                                   asp-controller="Admin" asp-action="TeacherEvaluations">
+                                    <i class="fa-solid fa-chart-simple me-2"></i> Teacher Performance
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link @(currentController == "Admin" && currentAction == "ListUsers" ? "active" : "")"
                                    asp-controller="Admin" asp-action="ListUsers">
                                     <i class="fa-solid fa-users me-2"></i> Manage Users
@@ -225,6 +231,12 @@
                                 <a class="nav-link @(currentController == "Student" && currentAction == "MyResults" ? "active" : "")"
                                    asp-controller="Student" asp-action="MyResults">
                                     <i class="fa-solid fa-square-poll-vertical me-2"></i> Results
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(currentAction == "EvaluationList" ? "active" : "")"
+                                   asp-controller="Student" asp-action="EvaluationList">
+                                    <i class="fa-solid fa-star-half-stroke me-2"></i> Teacher Evaluation
                                 </a>
                             </li>
                             <li class="nav-item">

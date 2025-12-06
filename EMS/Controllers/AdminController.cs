@@ -286,7 +286,6 @@ namespace EMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id, string source)
         {
-            // নিজের অ্যাকাউন্ট ডিলিট চেক
             if (id == _userManager.GetUserId(User))
             {
                 TempData["ErrorMessage"] = "You cannot delete your own account.";
@@ -296,49 +295,54 @@ namespace EMS.Controllers
             var user = await _userManager.FindByIdAsync(id);
             if (user != null)
             {
-                // --- রিলেটেড ডেটা ক্লিনআপ (Manual Cleanup) ---
-
-                // যদি স্টুডেন্ট হয়: তার সব একাডেমিক রেকর্ড মুছতে হবে
+                // --- ১. স্টুডেন্ট ক্লিনআপ ---
                 var studentProfile = await _context.StudentProfiles.FindAsync(id);
                 if (studentProfile != null)
                 {
-                    // Exam Results মুছতে হবে
+                    // আগের রেকর্ডগুলো (Result, Submission, Attendance)
                     var results = await _context.ExamResults.Where(r => r.StudentId == id).ToListAsync();
                     _context.ExamResults.RemoveRange(results);
 
-                    // Assignment Submissions মুছতে হবে
                     var submissions = await _context.AssignmentSubmissions.Where(s => s.StudentId == id).ToListAsync();
                     _context.AssignmentSubmissions.RemoveRange(submissions);
 
-                    // Attendance Records মুছতে হবে
                     var attendance = await _context.StudentAttendances.Where(a => a.StudentId == id).ToListAsync();
                     _context.StudentAttendances.RemoveRange(attendance);
 
-                    // সবশেষে প্রোফাইল মুছতে হবে
+                    // 👇 নতুন: স্টুডেন্টের দেওয়া ইভালুয়েশন/রিভিউ মুছতে হবে 👇
+                    var givenEvaluations = await _context.TeacherEvaluations.Where(e => e.StudentId == id).ToListAsync();
+                    _context.TeacherEvaluations.RemoveRange(givenEvaluations);
+                    // --------------------------------------------------
+
                     _context.StudentProfiles.Remove(studentProfile);
                 }
 
-                // খ. যদি টিচার হয়: তার প্রফেশনাল রেকর্ড ক্লিন করতে হবে
+                // --- ২. টিচার ক্লিনআপ ---
                 var teacherProfile = await _context.TeacherProfiles.FindAsync(id);
                 if (teacherProfile != null)
                 {
-                    // টিচারের কোর্সগুলো থেকে তাকে সরিয়ে দেওয়া (Unassign)
+                    // টিচারকে কোর্স থেকে আন-অ্যাসাইন করা
                     var courses = await _context.Courses.Where(c => c.TeacherId == id).ToListAsync();
                     foreach (var course in courses)
                     {
-                        course.TeacherId = null; // কোর্স থাকবে, কিন্তু টিচার থাকবে না
+                        course.TeacherId = null;
                     }
 
-                    // প্রোফাইল মুছতে হবে
+                    // টিচারের তৈরি করা অ্যাসাইনমেন্ট ডিলিট করা (যদি চাও)
+                    // var assignments = ... (সাধারণত অ্যাসাইনমেন্ট রেখে দেওয়া হয়)
+
+                    // 👇 নতুন: টিচার যে ইভালুয়েশনগুলো পেয়েছেন, সেগুলো মুছতে হবে 👇
+                    var receivedEvaluations = await _context.TeacherEvaluations.Where(e => e.TeacherId == id).ToListAsync();
+                    _context.TeacherEvaluations.RemoveRange(receivedEvaluations);
+                    // --------------------------------------------------------
+
                     _context.TeacherProfiles.Remove(teacherProfile);
                 }
 
-                // ডাটাবেসে এই পরিবর্তনগুলো সেভ
+                // ৩. সেভ চেঞ্জেস
                 await _context.SaveChangesAsync();
 
-                // -----------------------------------------------
-
-                // এখন নিরাপদে মেইন ইউজার ডিলিট 
+                // ৪. মেইন ইউজার ডিলিট
                 var result = await _userManager.DeleteAsync(user);
 
                 if (result.Succeeded)
@@ -350,14 +354,12 @@ namespace EMS.Controllers
                     return RedirectToAction(nameof(ListUsers));
                 }
 
-                // যদি ডিলিট না হয়
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError("", error.Description);
                 }
             }
 
-            // ইউজার না পাওয়া গেলে বা এরর হলে
             return RedirectToAction(nameof(ListUsers));
         }
 
@@ -989,6 +991,81 @@ namespace EMS.Controllers
             var semesters = await _context.Semesters.ToListAsync();
             model.DepartmentList = new SelectList(departments, "Id", "Name", model.DepartmentId);
             model.SemesterList = new SelectList(semesters, "Id", "Name", model.CurrentSemesterId);
+
+            return View(model);
+        }
+
+
+        // GET: Admin/TeacherEvaluations
+        public async Task<IActionResult> TeacherEvaluations()
+        {
+            // ১. সব টিচার এবং তাদের প্রোফাইল লোড করো
+            var teachers = await _context.Users
+                .Include(u => u.TeacherProfile)
+                    .ThenInclude(tp => tp.Department)
+                .Where(u => u.TeacherProfile != null)
+                .ToListAsync();
+
+            // ২. সব ইভালুয়েশন লোড করো
+            var evaluations = await _context.TeacherEvaluations.ToListAsync();
+
+            // ৩. রিপোর্ট তৈরি করো
+            var report = teachers.Select(t => {
+                var teacherReviews = evaluations.Where(e => e.TeacherId == t.Id).ToList();
+
+                return new TeacherEvaluationReportViewModel
+                {
+                    TeacherId = t.Id,
+                    TeacherName = $"{t.FirstName} {t.LastName}",
+                    Designation = t.TeacherProfile?.Designation ?? "N/A",
+                    Department = t.TeacherProfile?.Department?.Name ?? "N/A",
+                    TotalReviews = teacherReviews.Count,
+                    // গড় রেটিং বের করা (যদি রিভিউ না থাকে তবে ০)
+                    AverageRating = teacherReviews.Any() ? Math.Round(teacherReviews.Average(r => r.Rating), 1) : 0
+                };
+            })
+            .OrderByDescending(r => r.AverageRating) // সেরা রেটিং প্রাপ্ত টিচার আগে থাকবে
+            .ToList();
+
+            return View(report);
+        }
+
+        // GET: Admin/EvaluationDetails/5
+        public async Task<IActionResult> EvaluationDetails(string id)
+        {
+            if (id == null) return NotFound();
+
+            var teacher = await _context.Users
+                .Include(u => u.TeacherProfile)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (teacher == null) return NotFound();
+
+            // রিভিউ লোড করার সময় Semester ও Course ইনক্লুড করো
+            var reviews = await _context.TeacherEvaluations
+                .Include(e => e.Course)
+                    .ThenInclude(c => c.Semester) // <--- এই লাইনটি গুরুত্বপূর্ণ
+                .Where(e => e.TeacherId == id)
+                .OrderByDescending(e => e.SubmissionDate)
+                .ToListAsync();
+
+            var model = new EMS.Models.ViewModels.TeacherEvaluationReportViewModel
+            {
+                TeacherName = $"{teacher.FirstName} {teacher.LastName}",
+                AverageRating = reviews.Any() ? Math.Round(reviews.Average(r => r.Rating), 1) : 0,
+                Comments = reviews.Select(r => new EMS.Models.ViewModels.EvaluationDetail
+                {
+                    CourseCode = r.Course?.CourseCode ?? "N/A",
+
+                    // --- নতুন: সেমিস্টার ম্যাপ করা ---
+                    Semester = r.Course?.Semester?.Name ?? "N/A",
+                    // -------------------------------
+
+                    Rating = r.Rating,
+                    Comment = r.Comment,
+                    Date = r.SubmissionDate
+                }).ToList()
+            };
 
             return View(model);
         }

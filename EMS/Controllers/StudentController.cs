@@ -438,5 +438,107 @@ namespace EMS.Controllers
 
             return View(routines);
         }
+
+
+        // GET: Student/EvaluationList
+        public async Task<IActionResult> EvaluationList()
+        {
+            var userId = _userManager.GetUserId(User);
+            var student = await _context.Users.Include(u => u.StudentProfile).FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (student?.StudentProfile == null) return NotFound();
+
+            // ১. স্টুডেন্টের এনরোল করা কোর্সগুলো বের করো (যেখানে টিচার অ্যাসাইন করা আছে)
+            var courses = await _context.Courses
+                .Include(c => c.Teacher)
+                .Where(c => c.DepartmentId == student.StudentProfile.DepartmentId &&
+                            c.SemesterId == student.StudentProfile.SemesterId &&
+                            c.TeacherId != null)
+                .ToListAsync();
+
+            // ২. স্টুডেন্ট ইতিমধ্যে কাদের রিভিউ দিয়েছে তা চেক করো
+            var givenEvaluations = await _context.TeacherEvaluations
+                .Where(e => e.StudentId == userId)
+                .ToListAsync();
+
+            // ৩. ViewModel এ কনভার্ট করো
+            var model = courses.Select(c => new EMS.Models.ViewModels.TeacherEvaluationViewModel
+            {
+                CourseId = c.Id,
+                CourseCode = c.CourseCode,
+                CourseTitle = c.Title,
+                TeacherId = c.TeacherId,
+                TeacherName = $"{c.Teacher.FirstName} {c.Teacher.LastName}",
+                IsRated = givenEvaluations.Any(e => e.CourseId == c.Id)
+            }).ToList();
+
+            return View(model);
+        }
+
+        // GET: Student/RateTeacher/5
+        public async Task<IActionResult> RateTeacher(int courseId)
+        {
+            var course = await _context.Courses
+                .Include(c => c.Teacher)
+                .FirstOrDefaultAsync(c => c.Id == courseId);
+
+            if (course == null || course.TeacherId == null) return NotFound();
+
+            var model = new EMS.Models.ViewModels.TeacherEvaluationViewModel
+            {
+                CourseId = course.Id,
+                CourseCode = course.CourseCode,
+                CourseTitle = course.Title,
+                TeacherId = course.TeacherId,
+                TeacherName = $"{course.Teacher.FirstName} {course.Teacher.LastName}"
+            };
+
+            return View(model);
+        }
+
+        // POST: Student/RateTeacher
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RateTeacher(EMS.Models.ViewModels.TeacherEvaluationViewModel model)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // ১. মডেল ভ্যালিডেশন ফিক্স (Read-only ফিল্ডগুলো ইগনোর করা)
+            ModelState.Remove("TeacherName");
+            ModelState.Remove("CourseCode");
+            ModelState.Remove("CourseTitle");
+
+            // ২. ডুপ্লিকেট চেক
+            var exists = await _context.TeacherEvaluations
+                .AnyAsync(e => e.StudentId == userId && e.CourseId == model.CourseId);
+
+            if (exists)
+            {
+                TempData["ErrorMessage"] = "You have already rated this teacher for this course.";
+                return RedirectToAction(nameof(EvaluationList));
+            }
+
+            if (ModelState.IsValid)
+            {
+                var evaluation = new TeacherEvaluation
+                {
+                    StudentId = userId,
+                    TeacherId = model.TeacherId,
+                    CourseId = model.CourseId,
+                    Rating = model.Rating,
+                    Comment = model.Comment,
+                    SubmissionDate = DateTime.Now
+                };
+
+                _context.TeacherEvaluations.Add(evaluation);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Thank you for your feedback!";
+                return RedirectToAction(nameof(EvaluationList));
+            }
+
+            // ৩. যদি কোনো এরর থাকে, তবে আবার পেজ দেখাও
+            return View(model);
+        }
     }
 }
