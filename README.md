@@ -84,3 +84,23 @@ Open the Package Manager Console (View > Other Windows > Package Manager Console
 ```bash
 Update-Database
 ```
+
+This command will create the database, generate all necessary tables, and seed the default Admin user.
+
+### 5. Run the Application
+
+Press F5 or click the Run button in Visual Studio to start the application.
+
+## 🔐Default Login Credentials
+
+After running the migration, use the following credentials to log in as the System Administrator:
+
+Email: admin@ems.com
+
+Password: Admin@123
+
+(Once logged in, you can create new Teacher and Student accounts via the Admin Dashboard)
+
+## 📸 Screenshots
+
+Comming Soon.
