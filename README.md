@@ -62,3 +62,17 @@ Follow these steps to set up the project locally on your machine.
 ```bash
 git clone [https://github.com/samiulsani/ems.git](https://github.com/samiulsani/ems.git)
 ```
+
+### 3. Configure Database
+
+Open the project solution (EMS.sln) in Visual Studio.
+
+Open appsettings.json.
+
+Update the DefaultConnection string if necessary to match your local SQL Server instance:
+
+```bash
+"ConnectionStrings": {
+  "DefaultConnection": "Server=YOUR_SERVER_NAME;Database=EMSDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
+}
+```
