@@ -76,3 +76,11 @@ Update the DefaultConnection string if necessary to match your local SQL Server 
   "DefaultConnection": "Server=YOUR_SERVER_NAME;Database=EMSDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
 }
 ```
+
+### 4. Apply Migrations
+
+Open the Package Manager Console (View > Other Windows > Package Manager Console) and run.
+
+```bash
+Update-Database
+```
